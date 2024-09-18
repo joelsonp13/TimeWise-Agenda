@@ -93,18 +93,19 @@
 
     <script>
         // Firebase config
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID",
-            measurementId: "YOUR_MEASUREMENT_ID"
+          const firebaseConfig = {
+          apiKey: "AIzaSyBrG14qUCGOIMucxBArrhzZ2hG2ilidwnU",
+          authDomain: "time-wise-agendamentos.firebaseapp.com",
+          projectId: "time-wise-agendamentos",
+          storageBucket: "time-wise-agendamentos.appspot.com",
+          messagingSenderId: "833338728870",
+          appId: "1:833338728870:web:a80345b88915ef6a2f6f67",
+          measurementId: "G-2R9ZV4P3N3"
         };
-
+        
         // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
 
         // Firebase services
         const db = firebase.firestore();

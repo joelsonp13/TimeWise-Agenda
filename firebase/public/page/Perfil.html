@@ -128,7 +128,7 @@
                         if (doc.exists) {
                             const userData = doc.data();
                             userName.value = userData.name;
-                            document.getElementById('userName').textContent = Olá, ${userData.name};
+                            document.getElementById('userName').textContent = `Olá, ${userData.name}`;
                             userEmail.value = user.email;
                             if (userData.photoURL) {
                                 userPhoto.src = userData.photoURL;
@@ -144,7 +144,7 @@
                                 photoURL: user.photoURL || 'https://via.placeholder.com/150'
                             });
                             userName.value = defaultName;
-                            document.getElementById('userName').textContent = Olá, ${defaultName};
+                            document.getElementById('userName').textContent = `Olá, ${defaultName}`;
                         }
                     })
                     .catch((error) => {
@@ -159,7 +159,7 @@
         photoUpload.addEventListener('change', (e) => {
             const file = e.target.files[0];
             const user = firebase.auth().currentUser;
-            const storageRef = storage.ref(profile_photos/${user.uid});
+            const storageRef = storage.ref(`profile_photos/${user.uid}`);
             
             storageRef.put(file).then(() => {
                 return storageRef.getDownloadURL();
@@ -208,7 +208,7 @@
             const newName = userName.value;
 
             if (newName && newName.trim() !== '') {
-                if (confirm(Deseja salvar as alterações?)) {
+                if (confirm(`Deseja salvar as alterações?`)) {
                     user.updateProfile({
                         displayName: newName
                     }).then(() => {
@@ -217,7 +217,7 @@
                         });
                     }).then(() => {
                         alert('Alterações salvas com sucesso!');
-                        document.getElementById('userName').textContent = Olá, ${newName};
+                        document.getElementById('userName').textContent = `Olá, ${newName}`;
                     }).catch((error) => {
                         console.error("Erro ao salvar alterações:", error);
                         alert('Erro ao salvar alterações. Por favor, tente novamente mais tarde.');

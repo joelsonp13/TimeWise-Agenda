@@ -92,25 +92,25 @@
     </div>
 
     <script>
-        // Configuração do Firebase
+        // Firebase config
         const firebaseConfig = {
-            apiKey: "AIzaSyBrG14qUCGOIMucxBArrhzZ2hG2ilidwnU",
-            authDomain: "time-wise-agendamentos.firebaseapp.com",
-            projectId: "time-wise-agendamentos",
-            storageBucket: "time-wise-agendamentos.appspot.com",
-            messagingSenderId: "833338728870",
-            appId: "1:833338728870:web:f4f87d0e3f9c7dc92f6f67",
-            measurementId: "G-63ZD6V69EV"
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID",
+            measurementId: "YOUR_MEASUREMENT_ID"
         };
 
-        // Inicializar o Firebase
+        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
 
-        // Referências ao Firestore e Storage
+        // Firebase services
         const db = firebase.firestore();
         const storage = firebase.storage();
 
-        // Elementos do DOM
+        // DOM elements
         const userPhoto = document.getElementById('userPhoto');
         const photoUpload = document.getElementById('photoUpload');
         const userName = document.getElementById('userName');
@@ -120,111 +120,80 @@
         const updatePasswordButton = document.getElementById('updatePasswordButton');
         const saveButton = document.getElementById('saveButton');
 
-        // Carregar informações do usuário
+        // Load user information
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
                 db.collection('usersweb').doc(user.uid).get()
                     .then((doc) => {
                         if (doc.exists) {
-                            const userData = doc.data();
-                            userName.value = userData.name;
-                            document.getElementById('userName').textContent = `Olá, ${userData.name}`;
+                            userName.value = doc.data().name;
                             userEmail.value = user.email;
-                            if (userData.photoURL) {
-                                userPhoto.src = userData.photoURL;
-                            } else {
-                                userPhoto.src = 'https://via.placeholder.com/150';
-                            }
-                        } else {
-                            // Se o documento não existir, crie-o
-                            const defaultName = user.displayName || "Usuário";
-                            db.collection('usersweb').doc(user.uid).set({
-                                name: defaultName,
-                                email: user.email,
-                                photoURL: user.photoURL || 'https://via.placeholder.com/150'
-                            });
-                            userName.value = defaultName;
-                            document.getElementById('userName').textContent = `Olá, ${defaultName}`;
+                            userPhoto.src = doc.data().photoURL || 'default-profile-pic-url';
                         }
-                    })
-                    .catch((error) => {
-                        console.log("Erro ao buscar dados do usuário:", error);
                     });
-            } else {
-                window.location.href = '../login/LoginTimeWise.html';
-            }
-        });
 
-        // Upload de nova foto de perfil
-        photoUpload.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            const user = firebase.auth().currentUser;
-            const storageRef = storage.ref(`profile_photos/${user.uid}`);
-            
-            storageRef.put(file).then(() => {
-                return storageRef.getDownloadURL();
-            }).then((url) => {
-                userPhoto.src = url;
-                db.collection('usersweb').doc(user.uid).update({
-                    photoURL: url
-                });
-                user.updateProfile({
-                    photoURL: url
-                });
-            }).catch((error) => {
-                console.log("Erro ao fazer upload da foto:", error);
-            });
-        });
+                // Password confirmation to view
+                showPasswordButton.addEventListener('click', () => {
+                    const currentPassword = prompt("Digite sua senha atual para confirmar:");
+                    const credential = firebase.auth.EmailAuthProvider.credential(user.email, currentPassword);
 
-        // Mostrar senha
-        showPasswordButton.addEventListener('click', () => {
-            if (userPassword.type === 'password') {
-                userPassword.type = 'text';
-                showPasswordButton.innerHTML = '<i class="fas fa-eye-slash"></i>';
-            } else {
-                userPassword.type = 'password';
-                showPasswordButton.innerHTML = '<i class="fas fa-eye"></i>';
-            }
-        });
-
-        // Atualizar senha
-        updatePasswordButton.addEventListener('click', () => {
-            const auth = firebase.auth();
-            const user = auth.currentUser;
-
-            if (confirm("Deseja enviar um e-mail para atualizar sua senha?")) {
-                auth.sendPasswordResetEmail(user.email).then(() => {
-                    alert("Um e-mail para atualização de senha foi enviado para o seu endereço de e-mail.");
-                }).catch((error) => {
-                    console.error("Erro ao enviar e-mail de atualização de senha:", error);
-                    alert("Erro ao enviar e-mail de atualização de senha. Por favor, tente novamente mais tarde.");
-                });
-            }
-        });
-
-        // Salvar alterações
-        saveButton.addEventListener('click', () => {
-            const user = firebase.auth().currentUser;
-            const newName = userName.value;
-
-            if (newName && newName.trim() !== '') {
-                if (confirm(`Deseja salvar as alterações?`)) {
-                    user.updateProfile({
-                        displayName: newName
-                    }).then(() => {
-                        return db.collection('usersweb').doc(user.uid).update({
-                            name: newName
+                    // Reauthenticate user
+                    user.reauthenticateWithCredential(credential)
+                        .then(() => {
+                            userPassword.value = currentPassword;
+                        })
+                        .catch((error) => {
+                            alert("Senha incorreta. Tente novamente.");
                         });
-                    }).then(() => {
-                        alert('Alterações salvas com sucesso!');
-                        document.getElementById('userName').textContent = `Olá, ${newName}`;
-                    }).catch((error) => {
-                        console.error("Erro ao salvar alterações:", error);
-                        alert('Erro ao salvar alterações. Por favor, tente novamente mais tarde.');
+                });
+
+                // Update user information
+                saveButton.addEventListener('click', () => {
+                    db.collection('usersweb').doc(user.uid).set({
+                        name: userName.value,
+                    }, { merge: true })
+                    .then(() => {
+                        alert("Informações salvas com sucesso.");
                     });
-                }
-            } else {
-                alert('Por favor, insira um nome válido.');
+                });
+
+                // Update password logic
+                updatePasswordButton.addEventListener('click', () => {
+                    const currentPassword = prompt("Digite sua senha atual:");
+                    const credential = firebase.auth.EmailAuthProvider.credential(user.email, currentPassword);
+
+                    user.reauthenticateWithCredential(credential)
+                        .then(() => {
+                            const newPassword = prompt("Digite a nova senha:");
+                            if (newPassword) {
+                                user.updatePassword(newPassword)
+                                    .then(() => {
+                                        alert("Senha atualizada com sucesso.");
+                                    })
+                                    .catch((error) => {
+                                        alert("Erro ao atualizar a senha: " + error.message);
+                                    });
+                            }
+                        })
+                        .catch((error) => {
+                            alert("Senha atual incorreta. Não foi possível atualizar a senha.");
+                        });
+                });
+
+                // Upload profile photo
+                photoUpload.addEventListener('change', (event) => {
+                    const file = event.target.files[0];
+                    const storageRef = storage.ref().child(`profilePictures/${user.uid}`);
+
+                    storageRef.put(file).then(() => {
+                        storageRef.getDownloadURL().then((url) => {
+                            userPhoto.src = url;
+                            db.collection('usersweb').doc(user.uid).set({
+                                photoURL: url,
+                            }, { merge: true });
+                        });
+                    });
+                });
             }
         });
     </script>

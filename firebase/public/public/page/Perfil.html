@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Perfil do Usuário - TimeWise</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'dark-bg': '#121212',
+                        'dark-surface': '#1E1E1E',
+                        'orange-custom': '#f0971c'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .hover-grow {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .hover-grow:hover {
+            transform: scale(1.03);
+            box-shadow: 0 4px 20px rgba(240, 151, 28, 0.2);
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-dark-bg text-gray-300">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold mb-8 text-center text-orange-custom">Perfil do Usuário</h1>
+        <div class="bg-dark-surface rounded-lg shadow-lg p-8 hover-grow fade-in">
+            <div class="mb-6 text-center">
+                <img id="userPhoto" class="w-32 h-32 rounded-full mx-auto mb-4 border-2 border-orange-custom" src="" alt="Foto de perfil">
+                <input type="file" id="photoUpload" class="hidden" accept="image/*">
+                <label for="photoUpload" class="bg-orange-custom hover:bg-orange-600 text-white font-bold py-2 px-4 rounded cursor-pointer transition duration-300">
+                    Alterar foto de perfil
+                </label>
+            </div>
+            <div class="mb-4">
+                <label class="block text-orange-custom text-sm font-bold mb-2" for="userName">
+                    Nome
+                </label>
+                <input class="w-full p-2 rounded bg-gray-800 text-white" id="userName" type="text">
+            </div>
+            <div class="mb-4">
+                <label class="block text-orange-custom text-sm font-bold mb-2" for="userEmail">
+                    Email
+                </label>
+                <input class="w-full p-2 rounded bg-gray-800 text-white" id="userEmail" type="email" readonly>
+            </div>
+            <div>
+                <label class="block text-gray-400 text-sm font-bold mb-2" for="userPassword">
+                    <i class="fas fa-lock mr-2"></i>Senha
+                </label>
+                <div class="flex">
+                    <input class="w-full p-3 rounded-l bg-gray-800 text-white" id="userPassword" type="password" value="********" readonly>
+                    <button id="showPasswordButton" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 transition duration-300 flex items-center">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button id="updatePasswordButton" class="bg-orange-custom hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-r focus:outline-none focus:shadow-outline transition duration-300 flex items-center">
+                        <i class="fas fa-key"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="mt-6 flex justify-center">
+                <button id="saveButton" class="bg-orange-custom hover:bg-orange-600 text-white font-bold py-2 px-6 rounded-full focus:outline-none focus:shadow-outline transition duration-300 flex items-center justify-center">
+                    <i class="fas fa-save mr-2"></i>
+                    <span>Salvar</span>
+                </button>
+            </div>
+            <div class="text-center">
+                <a href="../TimeWise.html" class="inline-block align-baseline font-bold text-sm text-orange-custom hover:text-orange-600 transition duration-300">
+                    Voltar para a página inicial
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBrG14qUCGOIMucxBArrhzZ2hG2ilidwnU",
+            authDomain: "time-wise-agendamentos.firebaseapp.com",
+            projectId: "time-wise-agendamentos",
+            storageBucket: "time-wise-agendamentos.appspot.com",
+            messagingSenderId: "833338728870",
+            appId: "1:833338728870:web:f4f87d0e3f9c7dc92f6f67",
+            measurementId: "G-63ZD6V69EV"
+        };
+
+        // Inicializar o Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        // Referências ao Firestore e Storage
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
+        // Elementos do DOM
+        const userPhoto = document.getElementById('userPhoto');
+        const photoUpload = document.getElementById('photoUpload');
+        const userName = document.getElementById('userName');
+        const userEmail = document.getElementById('userEmail');
+        const userPassword = document.getElementById('userPassword');
+        const showPasswordButton = document.getElementById('showPasswordButton');
+        const updatePasswordButton = document.getElementById('updatePasswordButton');
+        const saveButton = document.getElementById('saveButton');
+
+        // Carregar informações do usuário
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                db.collection('usersweb').doc(user.uid).get()
+                    .then((doc) => {
+                        if (doc.exists) {
+                            const userData = doc.data();
+                            userName.value = userData.name;
+                            document.getElementById('userName').textContent = `Olá, ${userData.name}`;
+                            userEmail.value = user.email;
+                            if (userData.photoURL) {
+                                userPhoto.src = userData.photoURL;
+                            } else {
+                                userPhoto.src = 'https://via.placeholder.com/150';
+                            }
+                        } else {
+                            // Se o documento não existir, crie-o
+                            const defaultName = user.displayName || "Usuário";
+                            db.collection('usersweb').doc(user.uid).set({
+                                name: defaultName,
+                                email: user.email,
+                                photoURL: user.photoURL || 'https://via.placeholder.com/150'
+                            });
+                            userName.value = defaultName;
+                            document.getElementById('userName').textContent = `Olá, ${defaultName}`;
+                        }
+                    })
+                    .catch((error) => {
+                        console.log("Erro ao buscar dados do usuário:", error);
+                    });
+            } else {
+                window.location.href = '../login/LoginTimeWise.html';
+            }
+        });
+
+        // Upload de nova foto de perfil
+        photoUpload.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            const user = firebase.auth().currentUser;
+            const storageRef = storage.ref(`profile_photos/${user.uid}`);
+            
+            storageRef.put(file).then(() => {
+                return storageRef.getDownloadURL();
+            }).then((url) => {
+                userPhoto.src = url;
+                db.collection('usersweb').doc(user.uid).update({
+                    photoURL: url
+                });
+                user.updateProfile({
+                    photoURL: url
+                });
+            }).catch((error) => {
+                console.log("Erro ao fazer upload da foto:", error);
+            });
+        });
+
+        // Mostrar senha
+        showPasswordButton.addEventListener('click', () => {
+            if (userPassword.type === 'password') {
+                userPassword.type = 'text';
+                showPasswordButton.innerHTML = '<i class="fas fa-eye-slash"></i>';
+            } else {
+                userPassword.type = 'password';
+                showPasswordButton.innerHTML = '<i class="fas fa-eye"></i>';
+            }
+        });
+
+        // Atualizar senha
+        updatePasswordButton.addEventListener('click', () => {
+            const auth = firebase.auth();
+            const user = auth.currentUser;
+
+            if (confirm("Deseja enviar um e-mail para atualizar sua senha?")) {
+                auth.sendPasswordResetEmail(user.email).then(() => {
+                    alert("Um e-mail para atualização de senha foi enviado para o seu endereço de e-mail.");
+                }).catch((error) => {
+                    console.error("Erro ao enviar e-mail de atualização de senha:", error);
+                    alert("Erro ao enviar e-mail de atualização de senha. Por favor, tente novamente mais tarde.");
+                });
+            }
+        });
+
+        // Salvar alterações
+        saveButton.addEventListener('click', () => {
+            const user = firebase.auth().currentUser;
+            const newName = userName.value;
+
+            if (newName && newName.trim() !== '') {
+                if (confirm(`Deseja salvar as alterações?`)) {
+                    user.updateProfile({
+                        displayName: newName
+                    }).then(() => {
+                        return db.collection('usersweb').doc(user.uid).update({
+                            name: newName
+                        });
+                    }).then(() => {
+                        alert('Alterações salvas com sucesso!');
+                        document.getElementById('userName').textContent = `Olá, ${newName}`;
+                    }).catch((error) => {
+                        console.error("Erro ao salvar alterações:", error);
+                        alert('Erro ao salvar alterações. Por favor, tente novamente mais tarde.');
+                    });
+                }
+            } else {
+                alert('Por favor, insira um nome válido.');
+            }
+        });
+    </script>
+</body>
+</html>

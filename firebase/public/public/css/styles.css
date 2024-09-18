@@ -1,0 +1,38 @@
+.hover-grow {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.hover-grow:hover {
+    transform: scale(1.03);
+    box-shadow: 0 4px 20px rgba(240, 151, 28, 0.2);
+}
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+.slide-in {
+    animation: slideIn 0.5s ease-out;
+}
+@keyframes slideIn {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+.card-type-required::before {
+    content: '* Selecione uma opção';
+    color: #f87171;
+    font-size: 0.75rem;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+#dropdownMenu {
+    z-index: 50;
+    transition: all 0.3s ease;
+}
+#dropdownMenu a, #dropdownMenu button {
+    transition: all 0.2s ease;
+}
+#dropdownMenu a:hover, #dropdownMenu button:hover {
+    background-color: #4a5568;
+}

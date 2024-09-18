@@ -11,7 +11,7 @@
       "dest": "/public/index.html"
     },
     {
-      "src": "/pages/(.*)",
+      "src": "/page/(.*)",
       "dest": "/public/page/$1"
     },
     {
@@ -23,11 +23,11 @@
       "dest": "/public/js/$1"
     },
     {
-      "src": "/images/(.*)",
+      "src": "/imagens/(.*)",
       "dest": "/public/imagens/$1"
     },
     {
-      "src": "/icons/(.*)",
+      "src": "/icones/(.*)",
       "dest": "/public/icones/$1"
     }
   ]

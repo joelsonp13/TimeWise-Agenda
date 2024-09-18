@@ -1,202 +1,208 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <title>Perfil do Usuário - TimeWise</title>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'dark-bg': '#121212',
-                        'dark-surface': '#1E1E1E',
-                        'orange-custom': '#f0971c'
-                    }
-                }
-            }
-        }
-    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-storage.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
-        .hover-grow {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
         }
-        .hover-grow:hover {
-            transform: scale(1.03);
-            box-shadow: 0 4px 20px rgba(240, 151, 28, 0.2);
+        .profile-container {
+            background-color: white;
+            padding: 20px;
+            max-width: 600px;
+            margin: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-        .fade-in {
-            animation: fadeIn 0.5s ease-in;
+        .profile-photo {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            display: block;
+            margin: auto;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        input[type="text"], input[type="password"], input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .btn {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .eye-icon {
+            cursor: pointer;
+            position: absolute;
+            right: 20px;
+            top: 40px;
         }
     </style>
 </head>
-<body class="bg-dark-bg text-gray-300">
-    <div class="container mx-auto px-4 py-8">
-        <h1 class="text-3xl font-bold mb-8 text-center text-orange-custom">Perfil do Usuário</h1>
-        <div class="bg-dark-surface rounded-lg shadow-lg p-8 hover-grow fade-in">
-            <div class="mb-6 text-center">
-                <img id="userPhoto" class="w-32 h-32 rounded-full mx-auto mb-4 border-2 border-orange-custom" src="" alt="Foto de perfil">
-                <input type="file" id="photoUpload" class="hidden" accept="image/*">
-                <label for="photoUpload" class="bg-orange-custom hover:bg-orange-600 text-white font-bold py-2 px-4 rounded cursor-pointer transition duration-300">
-                    Alterar foto de perfil
-                </label>
-            </div>
-            <div class="mb-4">
-                <label class="block text-orange-custom text-sm font-bold mb-2" for="userName">
-                    Nome
-                </label>
-                <input class="w-full p-2 rounded bg-gray-800 text-white" id="userName" type="text">
-            </div>
-            <div class="mb-4">
-                <label class="block text-orange-custom text-sm font-bold mb-2" for="userEmail">
-                    Email
-                </label>
-                <input class="w-full p-2 rounded bg-gray-800 text-white" id="userEmail" type="email" readonly>
-            </div>
-            <div>
-                <label class="block text-gray-400 text-sm font-bold mb-2" for="userPassword">
-                    <i class="fas fa-lock mr-2"></i>Senha
-                </label>
-                <div class="flex">
-                    <input class="w-full p-3 rounded-l bg-gray-800 text-white" id="userPassword" type="password" value="********" readonly>
-                    <button id="showPasswordButton" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 transition duration-300 flex items-center">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                    <button id="updatePasswordButton" class="bg-orange-custom hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-r focus:outline-none focus:shadow-outline transition duration-300 flex items-center">
-                        <i class="fas fa-key"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="mt-6 flex justify-center">
-                <button id="saveButton" class="bg-orange-custom hover:bg-orange-600 text-white font-bold py-2 px-6 rounded-full focus:outline-none focus:shadow-outline transition duration-300 flex items-center justify-center">
-                    <i class="fas fa-save mr-2"></i>
-                    <span>Salvar</span>
-                </button>
-            </div>
-            <div class="text-center">
-                <a href="../page/TimeWise.html" class="inline-block align-baseline font-bold text-sm text-orange-custom hover:text-orange-600 transition duration-300">
-                    Voltar para a página inicial
-                </a>
-            </div>
-        </div>
+<body>
+
+<div class="profile-container">
+    <h2>Perfil do Usuário</h2>
+
+    <!-- Profile photo -->
+    <img src="https://via.placeholder.com/150" id="userPhoto" class="profile-photo" alt="Foto do Perfil">
+    <input type="file" id="photoUpload">
+
+    <!-- User details -->
+    <input type="text" id="userName" placeholder="Nome">
+    <input type="text" id="userEmail" placeholder="Email" disabled>
+
+    <!-- Password section -->
+    <div style="position: relative;">
+        <input type="password" id="userPassword" placeholder="Senha">
+        <span id="showPasswordButton" class="eye-icon"><i class="fas fa-eye"></i></span>
     </div>
+    <button id="updatePasswordButton" class="btn">Atualizar Senha</button>
 
-    <script>
-        // Firebase config
-          const firebaseConfig = {
-          apiKey: "AIzaSyBrG14qUCGOIMucxBArrhzZ2hG2ilidwnU",
-          authDomain: "time-wise-agendamentos.firebaseapp.com",
-          projectId: "time-wise-agendamentos",
-          storageBucket: "time-wise-agendamentos.appspot.com",
-          messagingSenderId: "833338728870",
-          appId: "1:833338728870:web:a80345b88915ef6a2f6f67",
-          measurementId: "G-2R9ZV4P3N3"
-        };
-        
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
+    <!-- Save button -->
+    <button id="saveButton" class="btn">Salvar Alterações</button>
+</div>
 
-        // Firebase services
-        const db = firebase.firestore();
-        const storage = firebase.storage();
+<script>
+    // Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyBrG14qUCGOIMucxBArrhzZ2hG2ilidwnU",
+  authDomain: "time-wise-agendamentos.firebaseapp.com",
+  projectId: "time-wise-agendamentos",
+  storageBucket: "time-wise-agendamentos.appspot.com",
+  messagingSenderId: "833338728870",
+  appId: "1:833338728870:web:a80345b88915ef6a2f6f67",
+  measurementId: "G-2R9ZV4P3N3"
+};
 
-        // DOM elements
-        const userPhoto = document.getElementById('userPhoto');
-        const photoUpload = document.getElementById('photoUpload');
-        const userName = document.getElementById('userName');
-        const userEmail = document.getElementById('userEmail');
-        const userPassword = document.getElementById('userPassword');
-        const showPasswordButton = document.getElementById('showPasswordButton');
-        const updatePasswordButton = document.getElementById('updatePasswordButton');
-        const saveButton = document.getElementById('saveButton');
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const storage = firebase.storage();
 
-        // Load user information
-        firebase.auth().onAuthStateChanged((user) => {
-            if (user) {
-                db.collection('usersweb').doc(user.uid).get()
-                    .then((doc) => {
-                        if (doc.exists) {
-                            userName.value = doc.data().name;
-                            userEmail.value = user.email;
-                            userPhoto.src = doc.data().photoURL || 'default-profile-pic-url';
-                        }
-                    });
+    // Elements
+    const userPhoto = document.getElementById('userPhoto');
+    const photoUpload = document.getElementById('photoUpload');
+    const userName = document.getElementById('userName');
+    const userEmail = document.getElementById('userEmail');
+    const userPassword = document.getElementById('userPassword');
+    const showPasswordButton = document.getElementById('showPasswordButton');
+    const updatePasswordButton = document.getElementById('updatePasswordButton');
+    const saveButton = document.getElementById('saveButton');
 
-                // Password confirmation to view
-                showPasswordButton.addEventListener('click', () => {
-                    const currentPassword = prompt("Digite sua senha atual para confirmar:");
-                    const credential = firebase.auth.EmailAuthProvider.credential(user.email, currentPassword);
+    // Current user global variable
+    let currentUser;
 
-                    // Reauthenticate user
-                    user.reauthenticateWithCredential(credential)
-                        .then(() => {
-                            userPassword.value = currentPassword;
-                        })
-                        .catch((error) => {
-                            alert("Senha incorreta. Tente novamente.");
-                        });
-                });
-
-                // Update user information
-                saveButton.addEventListener('click', () => {
-                    db.collection('usersweb').doc(user.uid).set({
-                        name: userName.value,
-                    }, { merge: true })
-                    .then(() => {
-                        alert("Informações salvas com sucesso.");
-                    });
-                });
-
-                // Update password logic
-                updatePasswordButton.addEventListener('click', () => {
-                    const currentPassword = prompt("Digite sua senha atual:");
-                    const credential = firebase.auth.EmailAuthProvider.credential(user.email, currentPassword);
-
-                    user.reauthenticateWithCredential(credential)
-                        .then(() => {
-                            const newPassword = prompt("Digite a nova senha:");
-                            if (newPassword) {
-                                user.updatePassword(newPassword)
-                                    .then(() => {
-                                        alert("Senha atualizada com sucesso.");
-                                    })
-                                    .catch((error) => {
-                                        alert("Erro ao atualizar a senha: " + error.message);
-                                    });
-                            }
-                        })
-                        .catch((error) => {
-                            alert("Senha atual incorreta. Não foi possível atualizar a senha.");
-                        });
-                });
-
-                // Upload profile photo
-                photoUpload.addEventListener('change', (event) => {
-                    const file = event.target.files[0];
-                    const storageRef = storage.ref().child(`profilePictures/${user.uid}`);
-
-                    storageRef.put(file).then(() => {
-                        storageRef.getDownloadURL().then((url) => {
-                            userPhoto.src = url;
-                            db.collection('usersweb').doc(user.uid).set({
-                                photoURL: url,
-                            }, { merge: true });
-                        });
-                    });
-                });
+    // Display user data when logged in
+    auth.onAuthStateChanged(async (user) => {
+        if (user) {
+            currentUser = user;
+            const userDoc = await db.collection('users').doc(user.uid).get();
+            
+            // Display user information
+            if (userDoc.exists) {
+                userName.value = userDoc.data().name;
+                userEmail.value = user.email;
+                if (userDoc.data().photoURL) {
+                    userPhoto.src = userDoc.data().photoURL;
+                } else {
+                    userPhoto.src = 'https://via.placeholder.com/150';
+                }
+            } else {
+                console.error('No user data found in Firestore');
             }
-        });
-    </script>
+        } else {
+            console.log('No user is signed in');
+        }
+    });
+
+    // Handle photo upload
+    photoUpload.addEventListener('change', async (event) => {
+        const file = event.target.files[0];
+        if (file && currentUser) {
+            const storageRef = storage.ref(`profile_photos/${currentUser.uid}`);
+            await storageRef.put(file);
+            const photoURL = await storageRef.getDownloadURL();
+
+            // Update photo URL in Firestore
+            await db.collection('users').doc(currentUser.uid).update({
+                photoURL: photoURL
+            });
+
+            // Update photo on the UI
+            userPhoto.src = photoURL;
+            alert('Foto de perfil atualizada!');
+        }
+    });
+
+    // Toggle password visibility
+    showPasswordButton.addEventListener('click', () => {
+        if (userPassword.type === 'password') {
+            userPassword.type = 'text';
+            showPasswordButton.innerHTML = '<i class="fas fa-eye-slash"></i>';
+        } else {
+            userPassword.type = 'password';
+            showPasswordButton.innerHTML = '<i class="fas fa-eye"></i>';
+        }
+    });
+
+    // Confirm and update password
+    updatePasswordButton.addEventListener('click', () => {
+        const currentPassword = prompt('Confirme sua senha atual:');
+        if (currentPassword) {
+            const credentials = firebase.auth.EmailAuthProvider.credential(currentUser.email, currentPassword);
+            currentUser.reauthenticateWithCredential(credentials).then(() => {
+                const newPassword = prompt('Digite a nova senha:');
+                if (newPassword) {
+                    currentUser.updatePassword(newPassword).then(() => {
+                        alert('Senha atualizada com sucesso!');
+                    }).catch((error) => {
+                        console.error('Erro ao atualizar senha:', error);
+                        alert('Erro ao atualizar a senha.');
+                    });
+                }
+            }).catch((error) => {
+                console.error('Erro de reautenticação:', error);
+                alert('Senha atual incorreta.');
+            });
+        }
+    });
+
+    // Save updated user info
+    saveButton.addEventListener('click', async () => {
+        const newName = userName.value;
+        if (currentUser) {
+            await db.collection('users').doc(currentUser.uid).update({
+                name: newName
+            });
+            alert('Nome atualizado com sucesso!');
+        }
+    });
+</script>
+
 </body>
 </html>

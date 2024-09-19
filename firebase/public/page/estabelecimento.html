@@ -152,12 +152,7 @@
             <i class="fas fa-calendar-plus mr-2"></i>Buscar Por CNPJ TimeWise
         </h1>
         <div id="firebaseStatus" class="text-center mb-4"></div>
-        <input type="text" id="cnpjInput" placeholder="Digite o CNPJ"
-            class="border p-2 mb-4 w-full bg-dark-surface text-gray-300 rounded-lg">
-        <button onclick="fetchDataByCNPJ()"
-            class="bg-orange-custom hover:bg-orange-600 text-white font-bold py-2 px-4 rounded w-full transition duration-300 hover:shadow-lg">
-            <i class="fas fa-search mr-2"></i>Buscar Dados
-        </button>
+        <!-- The input and button have been removed -->
         <ul id="dataList" class="mt-8"></ul>
     </div>
 
@@ -194,78 +189,74 @@
     <script src="../js/authpre.js"></script>
     <script src="../js/pre.js"></script>
     <script>
-        // Utility function to get query parameters from the URL
-        function getQueryParam(param) {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get(param);
-        }
-
         // Format CNPJ to the expected format
-     function formatCNPJ(cnpj) {
-    // Remove non-numeric characters
-    cnpj = cnpj.replace(/\D/g, '');
-    // Format as expected
-    return cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
-}
+        function formatCNPJ(cnpj) {
+            // Remove non-numeric characters
+            cnpj = cnpj.replace(/\D/g, '');
+            // Format as expected
+            return cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
+        }
 
         // Fetch data by CNPJ
-    // Fetch data by CNPJ
-// Fetch data by CNPJ
-async function fetchDataByCNPJ() {
-    // Get the CNPJ from the URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const cnpj = urlParams.get('cnpj');
-    console.log('CNPJ from URL:', cnpj); // Print the CNPJ from the URL
+        async function fetchDataByCNPJ() {
+            // Get the CNPJ from the URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const cnpj = urlParams.get('cnpj');
+            console.log('CNPJ from URL:', cnpj); // Print the CNPJ from the URL
 
-    if (!cnpj) {
-        document.getElementById('firebaseStatus').textContent = 'CNPJ não fornecido na URL.';
-        return;
-    }
+            if (!cnpj) {
+                document.getElementById('firebaseStatus').textContent = 'CNPJ não fornecido na URL.';
+                return;
+            }
 
-    const formattedCNPJ = formatCNPJ(cnpj);
-    console.log('Formatted CNPJ:', formattedCNPJ); // Print the formatted CNPJ
+            const formattedCNPJ = formatCNPJ(cnpj);
+            console.log('Formatted CNPJ:', formattedCNPJ); // Print the formatted CNPJ
 
-    // Initialize Firestore
-    const db = firebase.firestore();
+            // Initialize Firestore
+            const db = firebase.firestore();
 
-    // Get all users
-    const usersSnapshot = await db.collection('users').get();
-    const dataList = document.getElementById('dataList');
-    dataList.innerHTML = '';
+            // Get all users
+            const usersSnapshot = await db.collection('users').get();
+            const dataList = document.getElementById('dataList');
+            dataList.innerHTML = '';
 
-    let found = false;
+            let found = false;
 
-    // Loop through each user
-    for (const userDoc of usersSnapshot.docs) {
-        const servicesSnapshot = await userDoc.ref.collection('services').where('cnpj', '==', formattedCNPJ).get();
-        if (!servicesSnapshot.empty) {
-            // If we find a match, display user and service information
-            for (const serviceDoc of servicesSnapshot.docs) {
-                const serviceData = serviceDoc.data();
-                const userData = userDoc.data();
+            // Loop through each user
+            for (const userDoc of usersSnapshot.docs) {
+                const servicesSnapshot = await userDoc.ref.collection('services').where('cnpj', '==', formattedCNPJ).get();
+                if (!servicesSnapshot.empty) {
+                    // If we find a match, display user and service information
+                    for (const serviceDoc of servicesSnapshot.docs) {
+                        const serviceData = serviceDoc.data();
+                        const userData = userDoc.data();
 
-                const listItem = document.createElement('li');
-                listItem.className = 'mb-4 p-4 bg-dark-surface rounded-lg shadow-md';
-                listItem.innerHTML = `
-                    <h3 class="text-xl font-bold text-orange-custom">Serviço: ${serviceData.serviceName}</h3>
-                    <p><strong>CNPJ:</strong> ${serviceData.cnpj}</p>
-                    <p><strong>Nome do Usuário:</strong> ${userData.name}</p>
-                    <p><strong>Email:</strong> ${userData.email}</p>
-                    <p><strong>Telefone:</strong> ${userData.phone}</p>
-                    <p><strong>Endereço:</strong> ${userData.address}</p>
-                `;
-                dataList.appendChild(listItem);
-                found = true;
+                        const listItem = document.createElement('li');
+                        listItem.className = 'mb-4 p-4 bg-dark-surface rounded-lg shadow-md';
+                        listItem.innerHTML = `
+                            <h3 class="text-xl font-bold text-orange-custom">Serviço: ${serviceData.serviceName}</h3>
+                            <p><strong>CNPJ:</strong> ${serviceData.cnpj}</p>
+                            <p><strong>Nome do Usuário:</strong> ${userData.name}</p>
+                            <p><strong>Email:</strong> ${userData.email}</p>
+                            <p><strong>Telefone:</strong> ${userData.phone}</p>
+                            <p><strong>Endereço:</strong> ${userData.address}</p>
+                        `;
+                        dataList.appendChild(listItem);
+                        found = true;
+                    }
+                }
+            }
+
+            if (!found) {
+                document.getElementById('firebaseStatus').textContent = 'Nenhum dado encontrado para o CNPJ fornecido.';
             }
         }
-    }
 
-    if (!found) {
-        document.getElementById('firebaseStatus').textContent = 'Nenhum dado encontrado para o CNPJ fornecido.';
-    }
-}
-
-
+        // Fetch the CNPJ automatically on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchDataByCNPJ();
+        });
+        
         // Verificar o estado de autenticação quando a página carregar
         document.addEventListener('DOMContentLoaded', () => {
             firebase.auth().onAuthStateChanged((user) => {

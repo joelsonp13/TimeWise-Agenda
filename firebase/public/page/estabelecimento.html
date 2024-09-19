@@ -204,42 +204,58 @@
         }
 
         // Fetch data by CNPJ
-        async function fetchDataByCNPJ() {
-            const cnpj = getQueryParam('cnpj') || document.getElementById('cnpjInput').value;
-            if (!cnpj) {
-                alert('Por favor, insira ou passe um CNPJ.');
-                return;
-            }
+       <script>
+    async function fetchDataByCNPJ() {
+        // Get the CNPJ from the URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const cnpj = urlParams.get('cnpj');
+        if (!cnpj) {
+            document.getElementById('firebaseStatus').textContent = 'CNPJ não fornecido na URL.';
+            return;
+        }
 
-            const formattedCNPJ = formatCNPJ(cnpj);
-            document.getElementById('firebaseStatus').textContent = 'Buscando dados...';
+        const formattedCNPJ = cnpj.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
 
-            try {
-                const firestore = firebase.firestore();
-                const usersCollection = firestore.collection('users');
-                const userDoc = await usersCollection.doc(formattedCNPJ).get();
+        // Initialize Firestore
+        const db = firebase.firestore();
 
-                if (userDoc.exists) {
+        // Get all users
+        const usersSnapshot = await db.collection('users').get();
+        const dataList = document.getElementById('dataList');
+        dataList.innerHTML = '';
+
+        let found = false;
+
+        // Loop through each user
+        for (const userDoc of usersSnapshot.docs) {
+            const servicesSnapshot = await userDoc.ref.collection('services').where('cnpj', '==', formattedCNPJ).get();
+            if (!servicesSnapshot.empty) {
+                // If we find a match, display user and service information
+                for (const serviceDoc of servicesSnapshot.docs) {
+                    const serviceData = serviceDoc.data();
                     const userData = userDoc.data();
-                    const servicesCollection = userDoc.ref.collection('services');
-                    const servicesSnapshot = await servicesCollection.get();
 
-                    if (servicesSnapshot.empty) {
-                        document.getElementById('dataList').innerHTML = '<li class="text-center">Nenhum serviço encontrado.</li>';
-                    } else {
-                        const listItems = servicesSnapshot.docs.map(doc => `<li class="mb-2">${doc.data().name}</li>`).join('');
-                        document.getElementById('dataList').innerHTML = listItems;
-                    }
-                } else {
-                    document.getElementById('dataList').innerHTML = '<li class="text-center">Usuário não encontrado.</li>';
+                    const listItem = document.createElement('li');
+                    listItem.className = 'mb-4 p-4 bg-dark-surface rounded-lg shadow-md';
+                    listItem.innerHTML = `
+                        <h3 class="text-xl font-bold text-orange-custom">Serviço: ${serviceData.serviceName}</h3>
+                        <p><strong>CNPJ:</strong> ${serviceData.cnpj}</p>
+                        <p><strong>Nome do Usuário:</strong> ${userData.name}</p>
+                        <p><strong>Email:</strong> ${userData.email}</p>
+                        <p><strong>Telefone:</strong> ${userData.phone}</p>
+                        <p><strong>Endereço:</strong> ${userData.address}</p>
+                    `;
+                    dataList.appendChild(listItem);
+                    found = true;
                 }
-            } catch (error) {
-                console.error('Erro ao buscar dados:', error);
-                document.getElementById('dataList').innerHTML = '<li class="text-center">Erro ao buscar dados.</li>';
-            } finally {
-                document.getElementById('firebaseStatus').textContent = '';
             }
         }
+
+        if (!found) {
+            document.getElementById('firebaseStatus').textContent = 'Nenhum dado encontrado para o CNPJ fornecido.';
+        }
+    }
+</script>
 
         // Verificar o estado de autenticação quando a página carregar
         document.addEventListener('DOMContentLoaded', () => {

@@ -27,69 +27,32 @@
     </script>
 </head>
 <body class="bg-dark-bg text-text-light">
-    <nav class="bg-gradient-to-r from-secondary to-primary p-4 shadow-lg">
+    <nav class="bg-secondary p-4 shadow-md">
         <div class="container mx-auto flex justify-between items-center">
-            <!-- Logo and Site Name -->
-            <h1 class="text-text-light text-3xl font-extrabold flex items-center">
-                <i class="fas fa-clock mr-3 animate-pulse"></i>TimeWise
+            <h1 class="text-primary text-2xl font-bold flex items-center">
+                <i class="fas fa-clock mr-2"></i>TimeWise
             </h1>
-
-            <!-- User Profile Section -->
-            <div id="userProfile" class="text-text-light">
+            <div id="userProfile" class="text-text-light hidden">
                 <div class="relative">
-                    <button id="userDropdown" class="flex items-center space-x-2 focus:outline-none transition duration-300 hover:text-accent">
+                    <button id="userDropdown" class="flex items-center space-x-2 focus:outline-none">
                         <div id="userAvatar" class="w-8 h-8 rounded-full bg-primary text-text-dark flex items-center justify-center mr-2"></div>
-                        <span id="userName" class="text-text-light">User</span>
-                        <i class="fas fa-chevron-down text-text-light ml-2 transition-transform transform duration-300"></i>
+                        <span id="userName" class="text-text-light"></span>
+                        <i class="fas fa-chevron-down text-text-light ml-2"></i>
                     </button>
-                    <!-- Dropdown Menu -->
-                    <div id="userMenu" class="absolute right-0 mt-2 w-48 bg-secondary rounded-md shadow-lg opacity-0 transform scale-95 transition-all duration-300 origin-top-right hidden">
-                        <a href="page/estabelecimento.html" class="block px-4 py-2 text-sm text-text-light hover:bg-accent" data-requires-auth>Agendar</a>
-                        <a href="page/Agendamentos.html" class="block px-4 py-2 text-sm text-text-light hover:bg-accent" data-requires-auth>Agendamentos</a>
-                        <a href="page/Perfil.html" class="block px-4 py-2 text-sm text-text-light hover:bg-accent" data-requires-auth>Perfil</a> 
-                        <a href="#" id="logoutButton" class="block px-4 py-2 text-sm text-text-light hover:bg-accent">Sair</a>
+                    <div id="userMenu" class="absolute right-0 mt-2 w-48 bg-secondary rounded-md shadow-lg hidden">
+                          <a href="page/estabelecimento.html" class="block px-4 py-2 text-sm text-text-light hover:bg-primary" data-requires-auth>Agendar</a>
+                        <a href="page/Agendamentos.html" class="block px-4 py-2 text-sm text-text-light hover:bg-primary" data-requires-auth>Agendamentos</a>
+                        <a href="page/Perfil.html" class="block px-4 py-2 text-sm text-text-light hover:bg-primary" data-requires-auth>Perfil</a> 
+                        <a href="#" id="logoutButton" class="block px-4 py-2 text-sm text-text-light hover:bg-primary">Sair</a>
                     </div>
                 </div>
             </div>
-
-            <!-- Authentication Buttons -->
             <div id="authButtons" class="text-text-light">
                 <a href="page/LoginTimeWise.html" class="bg-primary hover:bg-accent text-text-dark font-bold py-2 px-6 rounded-full transition duration-300 shadow-md hover:shadow-lg flex items-center justify-center">
                     <i class="fas fa-sign-in-alt mr-2"></i>Login
                 </a>
             </div>
-        </div>
     </nav>
-
-    <script>
-        // Toggle dropdown visibility and add/remove transition classes properly
-        const dropdownButton = document.getElementById('userDropdown');
-        const userMenu = document.getElementById('userMenu');
-
-        dropdownButton.addEventListener('click', function () {
-            userMenu.classList.toggle('hidden'); 
-            setTimeout(() => {
-                if (!userMenu.classList.contains('hidden')) {
-                    userMenu.classList.remove('opacity-0', 'scale-95');
-                    userMenu.classList.add('opacity-100', 'scale-100');
-                } else {
-                    userMenu.classList.remove('opacity-100', 'scale-100');
-                    userMenu.classList.add('opacity-0', 'scale-95');
-                }
-            }, 10);
-        });
-
-        // Close dropdown if clicked outside
-        window.addEventListener('click', function (e) {
-            if (!dropdownButton.contains(e.target) && !userMenu.contains(e.target)) {
-                userMenu.classList.add('hidden');
-                userMenu.classList.remove('opacity-100', 'scale-100');
-                userMenu.classList.add('opacity-0', 'scale-95');
-            }
-        });
-    </script>
-</body>
-
 
     <div class="container mx-auto px-4">
         <div class="flex flex-wrap justify-center items-end gap-4 bg-dark-bg p-8 rounded-lg">

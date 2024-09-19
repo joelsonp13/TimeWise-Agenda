@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TimeWise - Buscar Estabelecimento</title>
+    <title>Meu Projeto Tailwind com Firebase</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -67,7 +67,45 @@
             animation: fadeIn 0.5s ease-in-out;
         }
 
-        /* Style for the services section */
+        #comentarioCarrossel {
+            width: 100%;
+            overflow: hidden;
+        }
+
+        #comentarioSlider {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .comentario-item {
+            width: 25%;
+            /* 4 comentários por vez */
+            flex-shrink: 0;
+            padding: 0 8px;
+        }
+
+        @media (max-width: 1024px) {
+            .comentario-item {
+                width: 33.333%;
+                /* 3 comentários por vez em telas médias */
+            }
+        }
+
+        @media (max-width: 768px) {
+            .comentario-item {
+                width: 50%;
+                /* 2 comentários por vez em telas pequenas */
+            }
+        }
+
+        @media (max-width: 480px) {
+            .comentario-item {
+                width: 100%;
+                /* 1 comentário por vez em telas muito pequenas */
+            }
+        }
+
+        /* Add your service card styling here */
         .service-card {
             background-color: #1E1E1E;
             padding: 1.5rem;
@@ -106,28 +144,83 @@
             <h1 class="text-orange-custom text-2xl font-bold flex items-center">
                 <i class="fas fa-clock mr-2"></i>TimeWise
             </h1>
+            <div id="userProfile" class="text-gray-300 hidden relative">
+                <button id="menuButton"
+                    class="bg-orange-custom hover:bg-orange-600 text-white font-bold py-2 px-4 rounded transition duration-300 hover:shadow-lg flex items-center">
+                    <span id="userName" class="mr-2"></span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div id="dropdownMenu"
+                    class="absolute right-0 mt-2 w-48 bg-dark-surface rounded-md shadow-xl z-20 hidden">
+                    <a href="estabelecimento.html"
+                        class="block px-4 py-2 text-sm text-gray-300 hover:bg-orange-custom hover:text-white">
+                        <i class="fas fa-calendar-plus mr-2"></i>Agendar
+                    </a>
+                    <a href="Agendamentos.html"
+                        class="block px-4 py-2 text-sm text-gray-300 hover:bg-orange-custom hover:text-white">
+                        <i class="fas fa-calendar-check mr-2"></i>Agendamentos
+                    </a>
+                    <a href="Perfil.html"
+                        class="block px-4 py-2 text-sm text-gray-300 hover:bg-orange-custom hover:text-white">
+                        <i class="fas fa-user mr-2"></i>Perfil
+                    <a href="../index.html"
+                        class="block px-4 py-2 text-sm text-gray-300 hover:bg-orange-custom hover:text-white">
+                        <i class="fas fa-home mr-2"></i>Início
+                    </a>
+                    <button id="logoutButton"
+                        class="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-orange-custom hover:text-white">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Sair
+                    </button>
+                </div>
+            </div>
         </div>
     </nav>
 
     <div class="container mx-auto p-4">
         <h1 class="text-3xl font-bold mb-4 text-center text-orange-custom slide-in">
-            <i class="fas fa-calendar-plus mr-2"></i>Buscar Estabelecimento
+            <i class="fas fa-calendar-plus mr-2"></i>Buscar Por CNPJ TimeWise
         </h1>
         <div id="firebaseStatus" class="text-center mb-4"></div>
-
-        <div id="establishmentDetails" class="mb-8">
-            <!-- Estabelecimento details will be inserted here -->
-        </div>
-
+        <div id="establishmentDetails" class="mb-8"></div>
         <h2 class="text-2xl font-bold mb-4 text-center text-orange-custom">Serviços Oferecidos</h2>
         <ul id="servicesList" class="mt-8"></ul>
+    </div>
+
+    <!-- Modal de Agendamento -->
+    <div id="agendamentoModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4">
+        <div class="bg-dark-surface p-6 rounded-lg max-w-4xl w-full mx-auto shadow-lg fade-in">
+            <h2 class="text-2xl font-bold mb-4 text-orange-custom text-center">
+                <i class="fas fa-calendar-check mr-2"></i>Agendar Serviço
+            </h2>
+            <p id="servicoNome" class="mb-4 text-center"></p>
+            <div id="diasDisponiveis" class="mb-4">
+                <h3 class="text-xl font-bold mb-2 text-orange-custom"><i class="far fa-calendar-alt mr-2"></i>Dias
+                    Disponíveis</h3>
+            </div>
+            <div id="horariosDisponiveis" class="mb-4">
+                <h3 class="text-xl font-bold mb-2 text-orange-custom"><i class="far fa-clock mr-2"></i>Horários
+                    Disponíveis</h3>
+            </div>
+            <div id="workersDisponiveis" class="mb-4">
+                <h3 class="text-xl font-bold mb-2 text-orange-custom"><i class="fas fa-user-tie mr-2"></i>Funcionários
+                    Disponíveis</h3>
+            </div>
+            <button id="confirmButton" onclick="confirmarAgendamento()"
+                class="bg-orange-custom hover:bg-orange-600 text-white font-bold py-2 px-4 rounded w-full mb-2 transition duration-300 hover:shadow-lg"
+                disabled>
+                <i class="fas fa-check-circle mr-2"></i>Confirmar Agendamento
+            </button>
+            <button onclick="fecharModal()"
+                class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded w-full transition duration-300 hover:shadow-lg">
+                <i class="fas fa-times-circle mr-2"></i>Cancelar
+            </button>
+        </div>
     </div>
 
     <script src="../js/firebase-config.js"></script>
     <script src="../js/util.js"></script>
     <script src="../js/authpre.js"></script>
     <script src="../js/pre.js"></script>
-
     <script>
         // Format CNPJ to the expected format
         function formatCNPJ(cnpj) {
@@ -139,37 +232,26 @@
 
         // Fetch data by CNPJ
         async function fetchDataByCNPJ() {
-            // Get the CNPJ from the URL
             const urlParams = new URLSearchParams(window.location.search);
             const cnpj = urlParams.get('cnpj');
-            console.log('CNPJ from URL:', cnpj); // Print the CNPJ from the URL
-
             if (!cnpj) {
                 document.getElementById('firebaseStatus').textContent = 'CNPJ não fornecido na URL.';
                 return;
             }
 
             const formattedCNPJ = formatCNPJ(cnpj);
-            console.log('Formatted CNPJ:', formattedCNPJ); // Print the formatted CNPJ
-
-            // Initialize Firestore
             const db = firebase.firestore();
-
-            // Fetch establishment details
             const usersSnapshot = await db.collection('users').get();
             const establishmentDetails = document.getElementById('establishmentDetails');
             const servicesList = document.getElementById('servicesList');
-            servicesList.innerHTML = ''; // Clear services list
+            servicesList.innerHTML = '';
 
             let found = false;
 
-            // Loop through each user
             for (const userDoc of usersSnapshot.docs) {
                 const servicesSnapshot = await userDoc.ref.collection('services').where('cnpj', '==', formattedCNPJ).get();
                 if (!servicesSnapshot.empty) {
-                    const userData = userDoc.data(); // Fetch establishment data
-
-                    // Display establishment information
+                    const userData = userDoc.data();
                     establishmentDetails.innerHTML = `
                         <div class="text-center mb-4">
                             <img src="${userData.logoUrl}" alt="Logo de ${userData.establishmentName}" class="mx-auto mb-4" style="max-width: 150px;">
@@ -178,10 +260,8 @@
                         </div>
                     `;
 
-                    // Display services information
                     for (const serviceDoc of servicesSnapshot.docs) {
                         const serviceData = serviceDoc.data();
-
                         const listItem = document.createElement('li');
                         listItem.className = 'service-card';
                         listItem.innerHTML = `
@@ -204,20 +284,8 @@
             }
         }
 
-        // Fetch the CNPJ automatically on page load
         document.addEventListener('DOMContentLoaded', () => {
             fetchDataByCNPJ();
-        });
-
-        // Verificar o estado de autenticação quando a página carregar
-        document.addEventListener('DOMContentLoaded', () => {
-            firebase.auth().onAuthStateChanged((user) => {
-                if (!user) {
-                    const currentPage = window.location.pathname + window.location.search;
-                    sessionStorage.setItem('returnUrl', currentPage);
-                    window.location.href = 'LoginTimeWise.html';
-                }
-            });
         });
     </script>
 </body>

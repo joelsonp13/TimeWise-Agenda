@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meu Projeto Tailwind com Firebase</title>
+    <title>TimeWise - Buscar Estabelecimento</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -66,44 +66,6 @@
         #comentarioConteudo {
             animation: fadeIn 0.5s ease-in-out;
         }
-
-        #comentarioCarrossel {
-            width: 100%;
-            overflow: hidden;
-        }
-
-        #comentarioSlider {
-            display: flex;
-            transition: transform 0.5s ease-in-out;
-        }
-
-        .comentario-item {
-            width: 25%;
-            /* 4 comentários por vez */
-            flex-shrink: 0;
-            padding: 0 8px;
-        }
-
-        @media (max-width: 1024px) {
-            .comentario-item {
-                width: 33.333%;
-                /* 3 comentários por vez em telas médias */
-            }
-        }
-
-        @media (max-width: 768px) {
-            .comentario-item {
-                width: 50%;
-                /* 2 comentários por vez em telas pequenas */
-            }
-        }
-
-        @media (max-width: 480px) {
-            .comentario-item {
-                width: 100%;
-                /* 1 comentário por vez em telas muito pequenas */
-            }
-        }
     </style>
 </head>
 
@@ -118,12 +80,16 @@
 
     <div class="container mx-auto p-4">
         <h1 class="text-3xl font-bold mb-4 text-center text-orange-custom slide-in">
-            <i class="fas fa-calendar-plus mr-2"></i>Buscar Por CNPJ TimeWise
+            <i class="fas fa-calendar-plus mr-2"></i>Buscar Estabelecimento
         </h1>
         <div id="firebaseStatus" class="text-center mb-4"></div>
 
-        <!-- Removed the CNPJ input and search button -->
-        <ul id="dataList" class="mt-8"></ul>
+        <div id="establishmentDetails" class="mb-8">
+            <!-- Estabelecimento details will be inserted here -->
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 text-center text-orange-custom">Serviços Oferecidos</h2>
+        <ul id="servicesList" class="mt-8"></ul>
     </div>
 
     <script src="../js/firebase-config.js"></script>
@@ -158,10 +124,11 @@
             // Initialize Firestore
             const db = firebase.firestore();
 
-            // Get all users
+            // Fetch establishment details
             const usersSnapshot = await db.collection('users').get();
-            const dataList = document.getElementById('dataList');
-            dataList.innerHTML = '';
+            const establishmentDetails = document.getElementById('establishmentDetails');
+            const servicesList = document.getElementById('servicesList');
+            servicesList.innerHTML = ''; // Clear services list
 
             let found = false;
 
@@ -169,22 +136,29 @@
             for (const userDoc of usersSnapshot.docs) {
                 const servicesSnapshot = await userDoc.ref.collection('services').where('cnpj', '==', formattedCNPJ).get();
                 if (!servicesSnapshot.empty) {
-                    // If we find a match, display user and service information
+                    const userData = userDoc.data(); // Fetch establishment data
+
+                    // Display establishment information
+                    establishmentDetails.innerHTML = `
+                        <div class="text-center mb-4">
+                            <img src="${userData.logoUrl}" alt="Logo de ${userData.name}" class="mx-auto mb-4" style="max-width: 150px;">
+                            <h3 class="text-2xl font-bold text-orange-custom">${userData.name}</h3>
+                            <p class="text-lg">${userData.address}</p>
+                        </div>
+                    `;
+
+                    // Display services information
                     for (const serviceDoc of servicesSnapshot.docs) {
                         const serviceData = serviceDoc.data();
-                        const userData = userDoc.data();
 
                         const listItem = document.createElement('li');
                         listItem.className = 'mb-4 p-4 bg-dark-surface rounded-lg shadow-md';
                         listItem.innerHTML = `
-                            <h3 class="text-xl font-bold text-orange-custom">Serviço: ${serviceData.serviceName}</h3>
-                            <p><strong>CNPJ:</strong> ${serviceData.cnpj}</p>
-                            <p><strong>Nome do Usuário:</strong> ${userData.name}</p>
-                            <p><strong>Email:</strong> ${userData.email}</p>
-                            <p><strong>Telefone:</strong> ${userData.phone}</p>
-                            <p><strong>Endereço:</strong> ${userData.address}</p>
+                            <h4 class="text-xl font-bold text-orange-custom">Serviço: ${serviceData.serviceName}</h4>
+                            <p><strong>Descrição:</strong> ${serviceData.description}</p>
+                            <p><strong>Preço:</strong> R$ ${serviceData.price}</p>
                         `;
-                        dataList.appendChild(listItem);
+                        servicesList.appendChild(listItem);
                         found = true;
                     }
                 }
@@ -199,7 +173,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             fetchDataByCNPJ();
         });
-        
+
         // Verificar o estado de autenticação quando a página carregar
         document.addEventListener('DOMContentLoaded', () => {
             firebase.auth().onAuthStateChanged((user) => {

@@ -231,7 +231,7 @@ function iniciarArrasteCarrossel() {
 
 function agendarServico(serviceId, serviceName) {
     selectedServiceId = serviceId;
-    selectedCnpj = getCnpjFromUrl(); // Obter o CNPJ da URL
+    selectedCnpj = document.getElementById('cnpjInput').value;
     const modal = document.getElementById('agendamentoModal');
     const servicoNome = document.getElementById('servicoNome');
     servicoNome.textContent = `Serviço: ${serviceName}`;
@@ -340,23 +340,38 @@ function mostrarHorarios(day, startTime, endTime, dataFormatada) {
                 const [hora, minuto] = horario.split(':');
                 const horarioData = new Date(dataSelecionada.getFullYear(), dataSelecionada.getMonth(), dataSelecionada.getDate(), parseInt(hora), parseInt(minuto));
                 
-                if (horarioData < agora) {
-                    button.disabled = true;
-                    button.classList.add('bg-gray-600', 'cursor-not-allowed');
-                } else if (agendamentosExistentes.has(horario)) {
-                    button.disabled = true;
-                    button.classList.add('bg-red-600', 'cursor-not-allowed');
-                } else {
-                    button.classList.add('bg-orange-custom', 'hover:bg-orange-600');
-                    button.onclick = () => selecionarHorario(button, horario);
-                }
+                const isHorarioPastado = horarioData < agora;
+                const isHorarioAgendado = agendamentosExistentes.has(horario);
 
+                if (isHorarioPastado || isHorarioAgendado) {
+                    button.className = 'bg-red-500 text-white font-bold py-2 px-4 rounded mr-2 mb-2 opacity-50 cursor-not-allowed';
+                    button.disabled = true;
+                    button.title = isHorarioPastado ? 'Horário já passou' : 'Horário já agendado';
+                } else {
+                    button.className = 'bg-orange-custom hover:bg-orange-600 text-white font-bold py-2 px-4 rounded mr-2 mb-2 transition duration-300 hover:shadow-lg';
+                    button.onclick = () => {
+                        const timeButtons = document.querySelectorAll('#horariosDisponiveis button');
+                        timeButtons.forEach(btn => {
+                            btn.classList.remove('bg-green-700');
+                            btn.classList.add('bg-orange-custom');
+                        });
+                        button.classList.remove('bg-orange-custom', 'hover:bg-orange-600');
+                        button.classList.add('bg-green-700');
+                        selecionarHorario(button, horario);
+                        mostrarFuncionarios();
+                    };
+                }
+                
                 horariosDisponiveis.appendChild(button);
             });
+
+            if (horariosDisponiveis.children.length === 1) {
+                horariosDisponiveis.innerHTML += '<p>Nenhum horário disponível para este dia.</p>';
+            }
         })
         .catch((error) => {
-            console.error("Erro ao buscar agendamentos:", error);
-            horariosDisponiveis.innerHTML = '<p class="text-red-400">Erro ao buscar agendamentos.</p>';
+            console.error("Erro ao buscar agendamentos existentes: ", error);
+            horariosDisponiveis.innerHTML += '<p class="text-red-500">Erro ao carregar horários. Por favor, tente novamente.</p>';
         });
 }
 
@@ -485,8 +500,6 @@ function confirmarAgendamento() {
         redirecionarParaLogin();
         return;
     }
-
-    selectedCnpj = getCnpjFromUrl(); // Obter o CNPJ da URL
 
     console.log("Dados do agendamento:", {
         selectedCnpj,

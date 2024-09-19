@@ -150,34 +150,25 @@
             <i class="fas fa-calendar-plus mr-2"></i>Buscar Por CNPJ TimeWise
         </h1>
         <div id="firebaseStatus" class="text-center mb-4"></div>
-        <input type="text" id="cnpjInput" placeholder="Digite o CNPJ"
-            class="border p-2 mb-4 w-full bg-dark-surface text-gray-300 rounded-lg">
-        <button onclick="fetchDataByCNPJ()"
-            class="bg-orange-custom hover:bg-orange-600 text-white font-bold py-2 px-4 rounded w-full transition duration-300 hover:shadow-lg">
-            <i class="fas fa-search mr-2"></i>Buscar Dados
-        </button>
+        <!-- Removed Search Input and Button -->
         <ul id="dataList" class="mt-8"></ul>
     </div>
 
     <!-- Modal de Agendamento -->
     <div id="agendamentoModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4">
         <div class="bg-dark-surface p-6 rounded-lg max-w-4xl w-full mx-auto shadow-lg fade-in">
-            <!-- Alterado de max-w-2xl para max-w-4xl -->
             <h2 class="text-2xl font-bold mb-4 text-orange-custom text-center">
                 <i class="fas fa-calendar-check mr-2"></i>Agendar Serviço
             </h2>
             <p id="servicoNome" class="mb-4 text-center"></p>
             <div id="diasDisponiveis" class="mb-4">
-                <h3 class="text-xl font-bold mb-2 text-orange-custom"><i class="far fa-calendar-alt mr-2"></i>Dias
-                    Disponíveis</h3>
+                <h3 class="text-xl font-bold mb-2 text-orange-custom"><i class="far fa-calendar-alt mr-2"></i>Dias Disponíveis</h3>
             </div>
             <div id="horariosDisponiveis" class="mb-4">
-                <h3 class="text-xl font-bold mb-2 text-orange-custom"><i class="far fa-clock mr-2"></i>Horários
-                    Disponíveis</h3>
+                <h3 class="text-xl font-bold mb-2 text-orange-custom"><i class="far fa-clock mr-2"></i>Horários Disponíveis</h3>
             </div>
             <div id="workersDisponiveis" class="mb-4">
-                <h3 class="text-xl font-bold mb-2 text-orange-custom"><i class="fas fa-user-tie mr-2"></i>Funcionários
-                    Disponíveis</h3>
+                <h3 class="text-xl font-bold mb-2 text-orange-custom"><i class="fas fa-user-tie mr-2"></i>Funcionários Disponíveis</h3>
             </div>
             <button id="confirmButton" onclick="confirmarAgendamento()"
                 class="bg-orange-custom hover:bg-orange-600 text-white font-bold py-2 px-4 rounded w-full mb-2 transition duration-300 hover:shadow-lg"
@@ -218,7 +209,24 @@
                     window.location.href = 'LoginTimeWise.html';
                 }
             });
+            
+            // Extract CNPJ from URL hash and fetch data
+            const hash = window.location.hash.substring(1); // Remove the '#' character
+            const params = new URLSearchParams(hash);
+            const cnpj = params.get('cnpj');
+            
+            if (cnpj) {
+                document.getElementById('dataList').innerHTML = `<li>Loading data for CNPJ: ${cnpj}</li>`;
+                fetchDataByCNPJ(cnpj);
+            }
         });
+        
+        function fetchDataByCNPJ(cnpj) {
+            // Your existing code to fetch data from Firebase by CNPJ
+            // This function should now accept a `cnpj` parameter
+            console.log("Fetching data for CNPJ:", cnpj);
+            // Implement the fetch logic here
+        }
     </script>
 </body>
 

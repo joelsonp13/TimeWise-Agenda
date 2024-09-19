@@ -187,29 +187,27 @@
     <script src="../js/authpre.js"></script>
     <script src="../js/pre.js"></script>
     <script>
-        // Verificar o estado de autenticação quando a página carregar
+        // Initialize Firebase
+    const firebaseConfig = {
+  apiKey: "AIzaSyBrG14qUCGOIMucxBArrhzZ2hG2ilidwnU",
+  authDomain: "time-wise-agendamentos.firebaseapp.com",
+  projectId: "time-wise-agendamentos",
+  storageBucket: "time-wise-agendamentos.appspot.com",
+  messagingSenderId: "833338728870",
+  appId: "1:833338728870:web:a80345b88915ef6a2f6f67",
+  measurementId: "G-2R9ZV4P3N3"
+};
+        firebase.initializeApp(firebaseConfig);
+
         document.addEventListener('DOMContentLoaded', () => {
-            console.log("DOMContentLoaded em pre.101.1.html");
             firebase.auth().onAuthStateChanged((user) => {
-                console.log("Estado de autenticação mudou em pre.101.1.html. Usuário:", user ? user.uid : "não autenticado");
                 if (!user) {
                     const currentPage = window.location.pathname + window.location.search;
                     sessionStorage.setItem('returnUrl', currentPage);
-                    console.log("Usuário não autenticado. Salvando returnUrl:", currentPage);
                     window.location.href = 'LoginTimeWise.html';
                 }
             });
-        });
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            firebase.auth().onAuthStateChanged((user) => {
-                if (!user) {
-                    sessionStorage.setItem('returnUrl', 'pre.101.1.html');
-                    window.location.href = 'LoginTimeWise.html';
-                }
-            });
-            
+
             // Extract CNPJ from URL hash and fetch data
             const hash = window.location.hash.substring(1); // Remove the '#' character
             const params = new URLSearchParams(hash);
@@ -220,65 +218,65 @@
                 fetchDataByCNPJ(cnpj);
             }
         });
-      function fetchDataByCNPJ(cnpj) {
-    // Reference to Firestore
-    const db = firebase.firestore();
 
-    // Query Firestore for the user with the given CNPJ
-    db.collection('users')
-        .where('cnpj', '==', cnpj)
-        .get()
-        .then((querySnapshot) => {
-            if (querySnapshot.empty) {
-                // Handle case where no documents are found
-                document.getElementById('dataList').innerHTML = `<li>No data found for CNPJ: ${cnpj}</li>`;
-                return;
-            }
+        function fetchDataByCNPJ(cnpj) {
+            // Reference to Firestore
+            const db = firebase.firestore();
 
-            // Assuming there is only one document per CNPJ
-            querySnapshot.forEach((doc) => {
-                const userId = doc.id; // Document ID (random UID)
-                const userInformation = doc.data(); // User information
+            // Query Firestore for the user with the given CNPJ
+            db.collection('users')
+                .where('cnpj', '==', cnpj)
+                .get()
+                .then((querySnapshot) => {
+                    if (querySnapshot.empty) {
+                        // Handle case where no documents are found
+                        document.getElementById('dataList').innerHTML = `<li>No data found for CNPJ: ${cnpj}</li>`;
+                        return;
+                    }
 
-                // Fetch services subcollection
-                db.collection('users').doc(userId).collection('services').get()
-                    .then((servicesSnapshot) => {
-                        if (servicesSnapshot.empty) {
-                            document.getElementById('dataList').innerHTML += `<li>No services found for CNPJ: ${cnpj}</li>`;
-                            return;
-                        }
+                    // Assuming there is only one document per CNPJ
+                    querySnapshot.forEach((doc) => {
+                        const userId = doc.id; // Document ID (random UID)
+                        const userInformation = doc.data(); // User information
 
-                        // Process and display user information and services
-                        let userInfoHtml = `<li>User Information:</li>`;
-                        userInfoHtml += `<ul>`;
-                        for (const [key, value] of Object.entries(userInformation)) {
-                            userInfoHtml += `<li><strong>${key}:</strong> ${value}</li>`;
-                        }
-                        userInfoHtml += `</ul>`;
+                        // Fetch services subcollection
+                        db.collection('users').doc(userId).collection('services').get()
+                            .then((servicesSnapshot) => {
+                                if (servicesSnapshot.empty) {
+                                    document.getElementById('dataList').innerHTML += `<li>No services found for CNPJ: ${cnpj}</li>`;
+                                    return;
+                                }
 
-                        let servicesHtml = `<li>Services:</li>`;
-                        servicesHtml += `<ul>`;
-                        servicesSnapshot.forEach((serviceDoc) => {
-                            const serviceData = serviceDoc.data();
-                            servicesHtml += `<li><strong>${serviceData.name}:</strong> ${serviceData.details}</li>`;
-                        });
-                        servicesHtml += `</ul>`;
+                                // Process and display user information and services
+                                let userInfoHtml = `<li>User Information:</li>`;
+                                userInfoHtml += `<ul>`;
+                                for (const [key, value] of Object.entries(userInformation)) {
+                                    userInfoHtml += `<li><strong>${key}:</strong> ${value}</li>`;
+                                }
+                                userInfoHtml += `</ul>`;
 
-                        // Combine and display both user information and services
-                        document.getElementById('dataList').innerHTML = userInfoHtml + servicesHtml;
-                    })
-                    .catch((error) => {
-                        console.error("Error fetching services:", error);
-                        document.getElementById('dataList').innerHTML = `<li>Error fetching services for CNPJ: ${cnpj}</li>`;
+                                let servicesHtml = `<li>Services:</li>`;
+                                servicesHtml += `<ul>`;
+                                servicesSnapshot.forEach((serviceDoc) => {
+                                    const serviceData = serviceDoc.data();
+                                    servicesHtml += `<li><strong>${serviceData.name}:</strong> ${serviceData.details}</li>`;
+                                });
+                                servicesHtml += `</ul>`;
+
+                                // Combine and display both user information and services
+                                document.getElementById('dataList').innerHTML = userInfoHtml + servicesHtml;
+                            })
+                            .catch((error) => {
+                                console.error("Error fetching services:", error);
+                                document.getElementById('dataList').innerHTML = `<li>Error fetching services for CNPJ: ${cnpj}</li>`;
+                            });
                     });
-            });
-        })
-        .catch((error) => {
-            console.error("Error fetching user data:", error);
-            document.getElementById('dataList').innerHTML = `<li>Error fetching data for CNPJ: ${cnpj}</li>`;
-        });
-}
-
+                })
+                .catch((error) => {
+                    console.error("Error fetching user data:", error);
+                    document.getElementById('dataList').innerHTML = `<li>Error fetching data for CNPJ: ${cnpj}</li>`;
+                });
+        }
     </script>
 </body>
 

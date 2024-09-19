@@ -35,12 +35,12 @@
             </h1>
 
             <!-- User Profile Section -->
-            <div id="userProfile" class="text-text-light hidden">
+            <div id="userProfile" class="text-text-light">
                 <div class="relative">
                     <button id="userDropdown" class="flex items-center space-x-2 focus:outline-none transition duration-300 hover:text-accent">
                         <div id="userAvatar" class="w-8 h-8 rounded-full bg-primary text-text-dark flex items-center justify-center mr-2"></div>
                         <span id="userName" class="text-text-light">User</span>
-                        <i class="fas fa-chevron-down text-text-light ml-2 transition-transform transform duration-300 hover:rotate-180"></i>
+                        <i class="fas fa-chevron-down text-text-light ml-2 transition-transform transform duration-300"></i>
                     </button>
                     <!-- Dropdown Menu -->
                     <div id="userMenu" class="absolute right-0 mt-2 w-48 bg-secondary rounded-md shadow-lg opacity-0 transform scale-95 transition-all duration-300 origin-top-right hidden">
@@ -62,15 +62,34 @@
     </nav>
 
     <script>
-        // Toggle dropdown visibility
-        document.getElementById('userDropdown').addEventListener('click', function () {
-            const userMenu = document.getElementById('userMenu');
-            userMenu.classList.toggle('hidden');
-            userMenu.classList.toggle('opacity-0');
-            userMenu.classList.toggle('scale-95');
+        // Toggle dropdown visibility and add/remove transition classes properly
+        const dropdownButton = document.getElementById('userDropdown');
+        const userMenu = document.getElementById('userMenu');
+
+        dropdownButton.addEventListener('click', function () {
+            userMenu.classList.toggle('hidden'); 
+            setTimeout(() => {
+                if (!userMenu.classList.contains('hidden')) {
+                    userMenu.classList.remove('opacity-0', 'scale-95');
+                    userMenu.classList.add('opacity-100', 'scale-100');
+                } else {
+                    userMenu.classList.remove('opacity-100', 'scale-100');
+                    userMenu.classList.add('opacity-0', 'scale-95');
+                }
+            }, 10);
+        });
+
+        // Close dropdown if clicked outside
+        window.addEventListener('click', function (e) {
+            if (!dropdownButton.contains(e.target) && !userMenu.contains(e.target)) {
+                userMenu.classList.add('hidden');
+                userMenu.classList.remove('opacity-100', 'scale-100');
+                userMenu.classList.add('opacity-0', 'scale-95');
+            }
         });
     </script>
 </body>
+
 
     <div class="container mx-auto px-4">
         <div class="flex flex-wrap justify-center items-end gap-4 bg-dark-bg p-8 rounded-lg">

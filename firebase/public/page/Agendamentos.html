@@ -25,26 +25,34 @@
     </script>
 </head>
 <body class="bg-dark-bg text-gray-300">
-    <nav class="bg-dark-surface p-4 shadow-md">
+  <nav class="bg-secondary p-4 shadow-md">
         <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-orange-custom text-2xl font-bold flex items-center">
+            <h1 class="text-primary text-2xl font-bold flex items-center">
                 <i class="fas fa-clock mr-2"></i>TimeWise
             </h1>
-            <div id="userProfile" class="text-gray-300 hidden">
+            <div id="userProfile" class="text-text-light hidden">
                 <div class="relative">
                     <button id="userDropdown" class="flex items-center space-x-2 focus:outline-none">
-                        <span id="userName" class="text-white"></span>
-                        <i class="fas fa-chevron-down text-white"></i>
+                        <div id="userAvatar" class="w-8 h-8 rounded-full bg-primary text-text-dark flex items-center justify-center mr-2"></div>
+                        <span id="userName" class="text-text-light"></span>
+                        <i class="fas fa-chevron-down text-text-light ml-2"></i>
                     </button>
-                    <div id="dropdownMenu" class="absolute right-0 mt-2 w-48 bg-dark-surface rounded-md shadow-lg hidden">
-                        <a href="Agendamentos.html" class="block px-4 py-2 text-sm text-white hover:bg-gray-700">Agendamentos</a>
-                        <a href="Perfil.html" class="block px-4 py-2 text-sm text-white hover:bg-gray-700">Perfil</a>
-                        <a href="estabelecimento.html" class="block px-4 py-2 text-sm text-white hover:bg-gray-700">Agendar</a>     
-                        <a href="../index.html" class="block px-4 py-2 text-sm text-white hover:bg-gray-700">Início</a>
+                    <div id="userMenu" class="absolute right-0 mt-2 w-48 bg-secondary rounded-md shadow-lg hidden">
+                        <a href="../index.html" class="block px-4 py-2 text-sm text-white hover:bg-gray-700">
+                            <i class="fas fa-home mr-2"></i>Início
+                        </a>
+                          <a href="page/estabelecimento.html" class="block px-4 py-2 text-sm text-text-light hover:bg-primary" data-requires-auth>Agendar</a>
+            
+                        <a href="page/Perfil.html" class="block px-4 py-2 text-sm text-text-light hover:bg-primary" data-requires-auth>Perfil</a> 
+                        <a href="#" id="logoutButton" class="block px-4 py-2 text-sm text-text-light hover:bg-primary">Sair</a>
                     </div>
                 </div>
             </div>
-        </div>
+            <div id="authButtons" class="text-text-light">
+                <a href="page/LoginTimeWise.html" class="bg-primary hover:bg-accent text-text-dark font-bold py-2 px-6 rounded-full transition duration-300 shadow-md hover:shadow-lg flex items-center justify-center">
+                    <i class="fas fa-sign-in-alt mr-2"></i>Login
+                </a>
+            </div>
     </nav>
 
     <div class="container mx-auto px-4 py-8">

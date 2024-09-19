@@ -220,13 +220,65 @@
                 fetchDataByCNPJ(cnpj);
             }
         });
-        
-        function fetchDataByCNPJ(cnpj) {
-            // Your existing code to fetch data from Firebase by CNPJ
-            // This function should now accept a `cnpj` parameter
-            console.log("Fetching data for CNPJ:", cnpj);
-            // Implement the fetch logic here
-        }
+      function fetchDataByCNPJ(cnpj) {
+    // Reference to Firestore
+    const db = firebase.firestore();
+
+    // Query Firestore for the user with the given CNPJ
+    db.collection('users')
+        .where('cnpj', '==', cnpj)
+        .get()
+        .then((querySnapshot) => {
+            if (querySnapshot.empty) {
+                // Handle case where no documents are found
+                document.getElementById('dataList').innerHTML = `<li>No data found for CNPJ: ${cnpj}</li>`;
+                return;
+            }
+
+            // Assuming there is only one document per CNPJ
+            querySnapshot.forEach((doc) => {
+                const userId = doc.id; // Document ID (random UID)
+                const userInformation = doc.data(); // User information
+
+                // Fetch services subcollection
+                db.collection('users').doc(userId).collection('services').get()
+                    .then((servicesSnapshot) => {
+                        if (servicesSnapshot.empty) {
+                            document.getElementById('dataList').innerHTML += `<li>No services found for CNPJ: ${cnpj}</li>`;
+                            return;
+                        }
+
+                        // Process and display user information and services
+                        let userInfoHtml = `<li>User Information:</li>`;
+                        userInfoHtml += `<ul>`;
+                        for (const [key, value] of Object.entries(userInformation)) {
+                            userInfoHtml += `<li><strong>${key}:</strong> ${value}</li>`;
+                        }
+                        userInfoHtml += `</ul>`;
+
+                        let servicesHtml = `<li>Services:</li>`;
+                        servicesHtml += `<ul>`;
+                        servicesSnapshot.forEach((serviceDoc) => {
+                            const serviceData = serviceDoc.data();
+                            servicesHtml += `<li><strong>${serviceData.name}:</strong> ${serviceData.details}</li>`;
+                        });
+                        servicesHtml += `</ul>`;
+
+                        // Combine and display both user information and services
+                        document.getElementById('dataList').innerHTML = userInfoHtml + servicesHtml;
+                    })
+                    .catch((error) => {
+                        console.error("Error fetching services:", error);
+                        document.getElementById('dataList').innerHTML = `<li>Error fetching services for CNPJ: ${cnpj}</li>`;
+                    });
+            });
+        })
+        .catch((error) => {
+            console.error("Error fetching user data:", error);
+            document.getElementById('dataList').innerHTML = `<li>Error fetching data for CNPJ: ${cnpj}</li>`;
+        });
+}
+
     </script>
 </body>
 

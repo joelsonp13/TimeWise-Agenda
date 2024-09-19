@@ -24,7 +24,6 @@
         }
     </script>
     <style>
-        /* Your CSS styles */
         .hover-grow {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
@@ -114,36 +113,6 @@
             <h1 class="text-orange-custom text-2xl font-bold flex items-center">
                 <i class="fas fa-clock mr-2"></i>TimeWise
             </h1>
-            <div id="userProfile" class="text-gray-300 hidden relative">
-                <button id="menuButton"
-                    class="bg-orange-custom hover:bg-orange-600 text-white font-bold py-2 px-4 rounded transition duration-300 hover:shadow-lg flex items-center">
-                    <span id="userName" class="mr-2"></span>
-                    <i class="fas fa-chevron-down"></i>
-                </button>
-                <div id="dropdownMenu"
-                    class="absolute right-0 mt-2 w-48 bg-dark-surface rounded-md shadow-xl z-20 hidden">
-                    <a href="estabelecimento.html"
-                        class="block px-4 py-2 text-sm text-gray-300 hover:bg-orange-custom hover:text-white">
-                        <i class="fas fa-calendar-plus mr-2"></i>Agendar
-                    </a>
-                    <a href="Agendamentos.html"
-                        class="block px-4 py-2 text-sm text-gray-300 hover:bg-orange-custom hover:text-white">
-                        <i class="fas fa-calendar-check mr-2"></i>Agendamentos
-                    </a>
-                    <a href="Perfil.html"
-                        class="block px-4 py-2 text-sm text-gray-300 hover:bg-orange-custom hover:text-white">
-                        <i class="fas fa-user mr-2"></i>Perfil
-                    </a>
-                    <a href="../index.html"
-                        class="block px-4 py-2 text-sm text-gray-300 hover:bg-orange-custom hover:text-white">
-                        <i class="fas fa-home mr-2"></i>Início
-                    </a>
-                    <button id="logoutButton"
-                        class="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-orange-custom hover:text-white">
-                        <i class="fas fa-sign-out-alt mr-2"></i>Sair
-                    </button>
-                </div>
-            </div>
         </div>
     </nav>
 
@@ -152,42 +121,16 @@
             <i class="fas fa-calendar-plus mr-2"></i>Buscar Por CNPJ TimeWise
         </h1>
         <div id="firebaseStatus" class="text-center mb-4"></div>
-        <!-- The input and button have been removed -->
-        <ul id="dataList" class="mt-8"></ul>
-    </div>
 
-    <!-- Modal de Agendamento -->
-    <div id="agendamentoModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4">
-        <div class="bg-dark-surface p-6 rounded-lg max-w-4xl w-full mx-auto shadow-lg fade-in">
-            <h2 class="text-2xl font-bold mb-4 text-orange-custom text-center">
-                <i class="fas fa-calendar-check mr-2"></i>Agendar Serviço
-            </h2>
-            <p id="servicoNome" class="mb-4 text-center"></p>
-            <div id="diasDisponiveis" class="mb-4">
-                <h3 class="text-xl font-bold mb-2 text-orange-custom"><i class="far fa-calendar-alt mr-2"></i>Dias Disponíveis</h3>
-            </div>
-            <div id="horariosDisponiveis" class="mb-4">
-                <h3 class="text-xl font-bold mb-2 text-orange-custom"><i class="far fa-clock mr-2"></i>Horários Disponíveis</h3>
-            </div>
-            <div id="workersDisponiveis" class="mb-4">
-                <h3 class="text-xl font-bold mb-2 text-orange-custom"><i class="fas fa-user-tie mr-2"></i>Funcionários Disponíveis</h3>
-            </div>
-            <button id="confirmButton" onclick="confirmarAgendamento()"
-                class="bg-orange-custom hover:bg-orange-600 text-white font-bold py-2 px-4 rounded w-full mb-2 transition duration-300 hover:shadow-lg"
-                disabled>
-                <i class="fas fa-check-circle mr-2"></i>Confirmar Agendamento
-            </button>
-            <button onclick="fecharModal()"
-                class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded w-full transition duration-300 hover:shadow-lg">
-                <i class="fas fa-times-circle mr-2"></i>Cancelar
-            </button>
-        </div>
+        <!-- Removed the CNPJ input and search button -->
+        <ul id="dataList" class="mt-8"></ul>
     </div>
 
     <script src="../js/firebase-config.js"></script>
     <script src="../js/util.js"></script>
     <script src="../js/authpre.js"></script>
     <script src="../js/pre.js"></script>
+
     <script>
         // Format CNPJ to the expected format
         function formatCNPJ(cnpj) {

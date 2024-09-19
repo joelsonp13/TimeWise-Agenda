@@ -132,9 +132,9 @@ firebase.auth().onAuthStateChanged((user) => {
         const returnUrl = sessionStorage.getItem('returnUrl');
         if (returnUrl) {
             sessionStorage.removeItem('returnUrl');
-            window.location.href = 'returnUrl';
+            window.location.href = returnUrl;
         } else {
-            window.location.href = 'estabelecimento.html' // Se não houver returnUrl, redirecione para uma página padrão
+            window.location.href = returnUrl // Se não houver returnUrl, redirecione para uma página padrão
             
         }
     }

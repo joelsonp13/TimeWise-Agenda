@@ -19,12 +19,5 @@ firebase.auth().onAuthStateChanged((user) => {
                 window.location.href = 'estabelecimento.html'; // Redirect to the establishment page
             }
         }
-    } else {
-        // No user is logged in, ensure that the login form is displayed
-        if (currentPage === '/LoginTimeWise.html') {
-            // We're already on the login page, so show the login form
-            loginSection.style.display = 'block';
-            registerSection.style.display = 'none'; // Hide registration form
-        }
-    }
+    } 
 });

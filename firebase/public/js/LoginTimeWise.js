@@ -136,14 +136,14 @@ firebase.auth().onAuthStateChanged((user) => {
         if (isNewUser) {
             // If the user is newly registered, remove the flag and redirect to the login page
             sessionStorage.removeItem('isNewUser'); // Clean up the flag
-            window.location.href = 'login.html'; // Redirect to the login page
+            window.location.href = 'LoginTimeWise.html'; // Redirect to the login page
         } else {
             // Otherwise, the user is logging in, redirect to "estabelecimento.html"
             window.location.href = 'estabelecimento.html'; // Redirect to the establishment page
         }
     } else {
         // If no user is logged in, ensure the user stays on the login page or register page
-        window.location.href = 'login.html'; // Redirect to the login page (or keep it as needed)
+        window.location.href = 'LoginTimeWise.html'; // Redirect to the login page (or keep it as needed)
     }
 });
 

@@ -24,6 +24,7 @@
         }
     </script>
     <style>
+        /* Your CSS styles */
         .hover-grow {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
@@ -132,6 +133,7 @@
                     <a href="Perfil.html"
                         class="block px-4 py-2 text-sm text-gray-300 hover:bg-orange-custom hover:text-white">
                         <i class="fas fa-user mr-2"></i>Perfil
+                    </a>
                     <a href="../index.html"
                         class="block px-4 py-2 text-sm text-gray-300 hover:bg-orange-custom hover:text-white">
                         <i class="fas fa-home mr-2"></i>Início
@@ -204,77 +206,66 @@
         }
 
         // Fetch data by CNPJ
-       <script>
-    async function fetchDataByCNPJ() {
-        // Get the CNPJ from the URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const cnpj = urlParams.get('cnpj');
-        if (!cnpj) {
-            document.getElementById('firebaseStatus').textContent = 'CNPJ não fornecido na URL.';
-            return;
-        }
+    // Fetch data by CNPJ
+async function fetchDataByCNPJ() {
+    // Get the CNPJ from the URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const cnpj = urlParams.get('cnpj');
+    if (!cnpj) {
+        document.getElementById('firebaseStatus').textContent = 'CNPJ não fornecido na URL.';
+        return;
+    }
 
-        const formattedCNPJ = cnpj.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
+    const formattedCNPJ = formatCNPJ(cnpj);
 
-        // Initialize Firestore
-        const db = firebase.firestore();
+    // Initialize Firestore
+    const db = firebase.firestore();
 
-        // Get all users
-        const usersSnapshot = await db.collection('users').get();
-        const dataList = document.getElementById('dataList');
-        dataList.innerHTML = '';
+    // Get all users
+    const usersSnapshot = await db.collection('users').get();
+    const dataList = document.getElementById('dataList');
+    dataList.innerHTML = '';
 
-        let found = false;
+    let found = false;
 
-        // Loop through each user
-        for (const userDoc of usersSnapshot.docs) {
-            const servicesSnapshot = await userDoc.ref.collection('services').where('cnpj', '==', formattedCNPJ).get();
-            if (!servicesSnapshot.empty) {
-                // If we find a match, display user and service information
-                for (const serviceDoc of servicesSnapshot.docs) {
-                    const serviceData = serviceDoc.data();
-                    const userData = userDoc.data();
+    // Loop through each user
+    for (const userDoc of usersSnapshot.docs) {
+        const servicesSnapshot = await userDoc.ref.collection('services').where('cnpj', '==', formattedCNPJ).get();
+        if (!servicesSnapshot.empty) {
+            // If we find a match, display user and service information
+            for (const serviceDoc of servicesSnapshot.docs) {
+                const serviceData = serviceDoc.data();
+                const userData = userDoc.data();
 
-                    const listItem = document.createElement('li');
-                    listItem.className = 'mb-4 p-4 bg-dark-surface rounded-lg shadow-md';
-                    listItem.innerHTML = `
-                        <h3 class="text-xl font-bold text-orange-custom">Serviço: ${serviceData.serviceName}</h3>
-                        <p><strong>CNPJ:</strong> ${serviceData.cnpj}</p>
-                        <p><strong>Nome do Usuário:</strong> ${userData.name}</p>
-                        <p><strong>Email:</strong> ${userData.email}</p>
-                        <p><strong>Telefone:</strong> ${userData.phone}</p>
-                        <p><strong>Endereço:</strong> ${userData.address}</p>
-                    `;
-                    dataList.appendChild(listItem);
-                    found = true;
-                }
+                const listItem = document.createElement('li');
+                listItem.className = 'mb-4 p-4 bg-dark-surface rounded-lg shadow-md';
+                listItem.innerHTML = `
+                    <h3 class="text-xl font-bold text-orange-custom">Serviço: ${serviceData.serviceName}</h3>
+                    <p><strong>CNPJ:</strong> ${serviceData.cnpj}</p>
+                    <p><strong>Nome do Usuário:</strong> ${userData.name}</p>
+                    <p><strong>Email:</strong> ${userData.email}</p>
+                    <p><strong>Telefone:</strong> ${userData.phone}</p>
+                    <p><strong>Endereço:</strong> ${userData.address}</p>
+                `;
+                dataList.appendChild(listItem);
+                found = true;
             }
         }
-
-        if (!found) {
-            document.getElementById('firebaseStatus').textContent = 'Nenhum dado encontrado para o CNPJ fornecido.';
-        }
     }
-</script>
+
+    if (!found) {
+        document.getElementById('firebaseStatus').textContent = 'Nenhum dado encontrado para o CNPJ fornecido.';
+        console.log('CNPJ extracted from URL:', cnpj);
+
+    }
+}
 
         // Verificar o estado de autenticação quando a página carregar
         document.addEventListener('DOMContentLoaded', () => {
-            console.log("DOMContentLoaded em pre.101.1.html");
             firebase.auth().onAuthStateChanged((user) => {
-                console.log("Estado de autenticação mudou em pre.101.1.html. Usuário:", user ? user.uid : "não autenticado");
                 if (!user) {
                     const currentPage = window.location.pathname + window.location.search;
                     sessionStorage.setItem('returnUrl', currentPage);
-                    console.log("Usuário não autenticado. Salvando returnUrl:", currentPage);
-                    window.location.href = 'LoginTimeWise.html';
-                }
-            });
-        });
-
-        document.addEventListener('DOMContentLoaded', () => {
-            firebase.auth().onAuthStateChanged((user) => {
-                if (!user) {
-                    sessionStorage.setItem('returnUrl', 'pre.101.1.html');
                     window.location.href = 'LoginTimeWise.html';
                 }
             });

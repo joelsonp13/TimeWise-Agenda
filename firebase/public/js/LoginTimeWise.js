@@ -135,7 +135,10 @@ firebase.auth().onAuthStateChanged((user) => {
         // Verifica se o usuário acabou de se registrar
         if (isNewUser) {
             sessionStorage.removeItem('isNewUser'); // Remove a flag após o uso
-            window.location.href = 'LoginTimeWise.html'; // Redireciona para a página de login
+
+            // Exibe a seção de login e oculta a seção de cadastro
+            document.getElementById('registerSection').style.display = 'none';
+            document.getElementById('loginSection').style.display = 'block';
         } else {
             // Caso contrário, o usuário está fazendo login
             const returnUrl = sessionStorage.getItem('returnUrl');
@@ -148,4 +151,5 @@ firebase.auth().onAuthStateChanged((user) => {
         }
     }
 });
+
 

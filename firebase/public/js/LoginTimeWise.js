@@ -139,21 +139,22 @@ firebase.auth().onAuthStateChanged((user) => {
         // Check if the user is newly registered (sessionStorage flag is set)
         const isNewUser = sessionStorage.getItem('isNewUser');
 
+        // If the user is newly registered, remove the flag and redirect to login
         if (isNewUser) {
             sessionStorage.removeItem('isNewUser'); // Clean up the flag
             if (currentPage !== '/LoginTimeWise.html') {
-                window.location.href = 'LoginTimeWise.html'; // Redirect to the login page
+                window.location.href = 'LoginTimeWise.html';
             }
         } else {
-            // Otherwise, redirect logged-in users to 'estabelecimento.html'
-            if (currentPage !== '/estabelecimento.html') {
-                window.location.href = 'estabelecimento.html'; // Redirect to establishment page
+            // Otherwise, the user is logging in; ensure they are not on the login page
+            if (currentPage === '/LoginTimeWise.html') {
+                window.location.href = 'estabelecimento.html'; // Redirect to the establishment page
             }
         }
     } else {
-        // Ensure logged-out users stay on the login page
+        // If no user is logged in, ensure the user stays on the login page
         if (currentPage !== '/LoginTimeWise.html') {
-            window.location.href = 'LoginTimeWise.html'; // Redirect to login page
+            window.location.href = 'LoginTimeWise.html';
         }
     }
 });

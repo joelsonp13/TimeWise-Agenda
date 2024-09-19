@@ -129,10 +129,10 @@ firebase.auth().onAuthStateChanged((user) => {
         const returnUrl = sessionStorage.getItem('returnUrl');
         if (returnUrl) {
             sessionStorage.removeItem('returnUrl');
-            window.location.href = 'LoginTimeWise.html';
+            window.location.href = 'returnUrl';
         } else {
             // Se não houver returnUrl, redirecione para uma página padrão
-            window.location.href = '../page/LoginTimeWise.html';
+            window.location.href = '../index.html';
         }
     }
 });

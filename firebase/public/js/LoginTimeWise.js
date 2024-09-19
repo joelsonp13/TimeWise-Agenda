@@ -64,6 +64,7 @@ loginForm.addEventListener('submit', (e) => {
 });
 
 // Cadastro
+// Cadastro
 registerForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const name = document.getElementById('registerName').value;
@@ -74,7 +75,7 @@ registerForm.addEventListener('submit', (e) => {
         .then((userCredential) => {
             sessionStorage.setItem('isNewUser', true);
             const user = userCredential.user;
-            
+
             // Salvar dados do usuário no Firestore
             return db.collection('usersweb').doc(user.uid).set({
                 name: name,
@@ -85,11 +86,13 @@ registerForm.addEventListener('submit', (e) => {
         .then(() => {
             message.textContent = "Cadastro realizado com sucesso!";
             message.style.color = "#4CAF50"; // Verde para sucesso
-            registerSection.style.display = 'none';
-            loginSection.style.display = 'block';
-                 setTimeout(() => {
-                message.textContent = "";
-            }, 4000);
+            
+            // Sign out the newly registered user to prevent auto-login
+            return firebase.auth().signOut();
+        })
+        .then(() => {
+            // After sign out, redirect to login page
+            window.location.href = 'LoginTimeWise.html'; // Redirect to the login page
         })
         .catch((error) => {
             let errorMessage = "";
@@ -110,6 +113,7 @@ registerForm.addEventListener('submit', (e) => {
             message.style.color = "#ff4444"; // Vermelho para erro
         });
 });
+
 
 // Recuperação de senha
 resetPasswordForm.addEventListener('submit', (e) => {

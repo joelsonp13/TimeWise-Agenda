@@ -196,61 +196,6 @@
     <script src="../js/authpre.js"></script>
     <script src="../js/pre.js"></script>
     <script>
-              function formatCNPJ(cnpj) {
-            if (!cnpj) return '';
-            cnpj = cnpj.replace(/\D/g, '');
-            return cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
-        }
-              async function fetchDataByCNPJ() {
-            const cnpjInput = document.getElementById('cnpjInput').value;
-            const formattedCNPJ = formatCNPJ(cnpjInput);
-
-            if (formattedCNPJ) {
-                try {
-                    const docRef = db.collection('your-collection').doc(formattedCNPJ);
-                    const doc = await docRef.get();
-                    if (doc.exists) {
-                        const data = doc.data();
-                        displayData(data); // Define this function to display data
-                    } else {
-                        console.log('No such document!');
-                    }
-                } catch (error) {
-                    console.error('Error fetching document: ', error);
-                }
-            } else {
-                console.log('Invalid CNPJ format');
-            }
-        }
-
-        function displayData(data) {
-            const dataList = document.getElementById('dataList');
-            dataList.innerHTML = `
-                <li>CNPJ: ${data.cnpj}</li>
-                <li>Nome: ${data.name}</li>
-                <!-- Add more fields as needed -->
-            `;
-        }
-
-        // Check URL for CNPJ and fetch data on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const cnpj = urlParams.get('cnpj');
-            if (cnpj) {
-                document.getElementById('cnpjInput').value = cnpj;
-                fetchDataByCNPJ();
-            }
-        });
-
-        // Handle authentication
-        document.addEventListener('DOMContentLoaded', () => {
-            firebase.auth().onAuthStateChanged((user) => {
-                if (!user) {
-                    sessionStorage.setItem('returnUrl', window.location.pathname + window.location.search);
-                    window.location.href = 'LoginTimeWise.html';
-                }
-            });
-        });
         // Verificar o estado de autenticação quando a página carregar
         document.addEventListener('DOMContentLoaded', () => {
             console.log("DOMContentLoaded em pre.101.1.html");

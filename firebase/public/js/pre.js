@@ -504,6 +504,10 @@ function confirmarAgendamento() {
     let userName = currentUser.displayName || 'Usuário Anônimo';
     let userPhotoURL = currentUser.photoURL || '';
 
+    // Calcular a data exata do agendamento
+    const dataExata = calcularDataExata(selectedDay);
+    const dataHoraExata = `${dataExata} ${selectedTime}`;
+
     console.log("Verificando disponibilidade do horário...");
     
     db.collection("appointments")
@@ -570,6 +574,7 @@ function confirmarAgendamento() {
                 workerName: workerName,
                 day: selectedDay,
                 time: selectedTime,
+                dataHoraExata: dataHoraExata, // Adicionando a data e hora exatas
                 price: serviceData.price,
                 createdAt: new Date().toISOString(),
                 realizado: false,
@@ -588,7 +593,7 @@ function confirmarAgendamento() {
         .then(() => {
             console.log("Agendamento salvo com sucesso.");
             const diaTraduzido = traduzirDiaParaPortugues(selectedDay);
-            alert(`Agendamento confirmado para ${diaTraduzido} às ${selectedTime} com ${workerName}`);
+            alert(`Agendamento confirmado para ${diaTraduzido}, ${dataHoraExata} com ${workerName}`);
             fecharModal();
             mostrarHorarios(selectedDay, currentStartTime, currentEndTime);
         })
@@ -601,6 +606,18 @@ function confirmarAgendamento() {
                 alert(`Ocorreu um erro durante o agendamento: ${error.message}`);
             }
         });
+}
+
+// Função auxiliar para calcular a data exata
+function calcularDataExata(selectedDay) {
+    const diasDaSemana = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    const hoje = new Date();
+    const indiceAtual = hoje.getDay();
+    const indiceAlvo = diasDaSemana.indexOf(selectedDay.toLowerCase());
+    const diasParaAdicionar = (indiceAlvo + 7 - indiceAtual) % 7;
+    const dataAgendamento = new Date(hoje);
+    dataAgendamento.setDate(hoje.getDate() + diasParaAdicionar);
+    return dataAgendamento.toLocaleDateString('pt-BR');
 }
 
 function fecharModal() {

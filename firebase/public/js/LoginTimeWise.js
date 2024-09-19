@@ -86,10 +86,10 @@ registerForm.addEventListener('submit', (e) => {
             message.style.color = "#4CAF50"; // Verde para sucesso
             registerSection.style.display = 'none';
             loginSection.style.display = 'block';
-        })
-          setTimeout(() => {
+                 setTimeout(() => {
                 message.textContent = "";
             }, 4000);
+        })
         .catch((error) => {
             let errorMessage = "";
             switch (error.code) {

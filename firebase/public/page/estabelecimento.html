@@ -4,13 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meus Agendamentos - TimeWise</title>
+    <title>Meu Projeto Tailwind com Firebase</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../css/styles.css">
     <script>
         tailwind.config = {
             theme: {
@@ -24,38 +23,118 @@
             }
         }
     </script>
+    <style>
+        .hover-grow {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .hover-grow:hover {
+            transform: scale(1.03);
+            box-shadow: 0 4px 20px rgba(240, 151, 28, 0.2);
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .slide-in {
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        #comentarioConteudo {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        #comentarioCarrossel {
+            width: 100%;
+            overflow: hidden;
+        }
+
+        #comentarioSlider {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .comentario-item {
+            width: 25%;
+            /* 4 comentários por vez */
+            flex-shrink: 0;
+            padding: 0 8px;
+        }
+
+        @media (max-width: 1024px) {
+            .comentario-item {
+                width: 33.333%;
+                /* 3 comentários por vez em telas médias */
+            }
+        }
+
+        @media (max-width: 768px) {
+            .comentario-item {
+                width: 50%;
+                /* 2 comentários por vez em telas pequenas */
+            }
+        }
+
+        @media (max-width: 480px) {
+            .comentario-item {
+                width: 100%;
+                /* 1 comentário por vez em telas muito pequenas */
+            }
+        }
+    </style>
 </head>
 
 <body class="bg-dark-bg text-gray-300">
-    <!-- Navigation Bar with User Dropdown -->
     <nav class="bg-dark-surface p-4 shadow-md">
         <div class="container mx-auto flex justify-between items-center">
             <h1 class="text-orange-custom text-2xl font-bold flex items-center">
                 <i class="fas fa-clock mr-2"></i>TimeWise
             </h1>
-
-            <!-- User Profile Dropdown -->
             <div id="userProfile" class="text-gray-300 hidden relative">
-                <button id="menuButton" class="bg-orange-custom hover:bg-orange-600 text-white font-bold py-2 px-4 rounded transition duration-300 hover:shadow-lg flex items-center">
+                <button id="menuButton"
+                    class="bg-orange-custom hover:bg-orange-600 text-white font-bold py-2 px-4 rounded transition duration-300 hover:shadow-lg flex items-center">
                     <span id="userName" class="mr-2"></span>
                     <i class="fas fa-chevron-down"></i>
                 </button>
-
-                <!-- Dropdown Menu -->
-                <div id="dropdownMenu" class="absolute right-0 mt-2 w-48 bg-dark-surface rounded-md shadow-xl z-20 hidden">
-                    <a href="estabelecimento.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-orange-custom hover:text-white">
-                        <i class="fas fa-calendar-plus mr-2"></i>Agendar
-                    </a>
-                    <a href="Agendamentos.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-orange-custom hover:text-white">
-                        <i class="fas fa-calendar-check mr-2"></i>Agendamentos
-                    </a>
-                    <a href="Perfil.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-orange-custom hover:text-white">
-                        <i class="fas fa-user mr-2"></i>Perfil
-                    </a>
-                    <a href="../index.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-orange-custom hover:text-white">
+                <div id="dropdownMenu"
+                    class="absolute right-0 mt-2 w-48 bg-dark-surface rounded-md shadow-xl z-20 hidden">
+                     <a href="../index.html"
+                        class="block px-4 py-2 text-sm text-gray-300 hover:bg-orange-custom hover:text-white">
                         <i class="fas fa-home mr-2"></i>Início
                     </a>
-                    <button id="logoutButton" class="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-orange-custom hover:text-white">
+                    <a href="Agendamentos.html"
+                        class="block px-4 py-2 text-sm text-gray-300 hover:bg-orange-custom hover:text-white">
+                        <i class="fas fa-calendar-check mr-2"></i>Agendamentos
+                    </a>
+                    <a href="Perfil.html"
+                        class="block px-4 py-2 text-sm text-gray-300 hover:bg-orange-custom hover:text-white">
+                        <i class="fas fa-user mr-2"></i>Perfil
+                    </a>
+                    <button id="logoutButton"
+                        class="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-orange-custom hover:text-white">
                         <i class="fas fa-sign-out-alt mr-2"></i>Sair
                     </button>
                 </div>
@@ -63,121 +142,80 @@
         </div>
     </nav>
 
-    <!-- Content Section -->
-    <div class="container mx-auto px-4 py-8">
-        <h2 class="text-3xl font-bold mb-6 text-center text-orange-custom slide-in">
-            <i class="fas fa-calendar-alt mr-2"></i>Meus Agendamentos
-        </h2>
-        <div id="agendamentosList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    <div class="container mx-auto p-4">
+        <h1 class="text-3xl font-bold mb-4 text-center text-orange-custom slide-in">
+            <i class="fas fa-calendar-plus mr-2"></i>Buscar Por CNPJ TimeWise
+        </h1>
+        <div id="firebaseStatus" class="text-center mb-4"></div>
+        <input type="text" id="cnpjInput" placeholder="Digite o CNPJ"
+            class="border p-2 mb-4 w-full bg-dark-surface text-gray-300 rounded-lg">
+        <button onclick="fetchDataByCNPJ()"
+            class="bg-orange-custom hover:bg-orange-600 text-white font-bold py-2 px-4 rounded w-full transition duration-300 hover:shadow-lg">
+            <i class="fas fa-search mr-2"></i>Buscar Dados
+        </button>
+        <ul id="dataList" class="mt-8"></ul>
     </div>
 
-    <!-- Modal de Pagamento -->
-    <div id="paymentModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden items-center justify-center z-50 p-4">
-        <div class="bg-dark-surface rounded-lg overflow-hidden shadow-2xl w-full max-w-sm md:max-w-md lg:max-w-lg mx-auto">
-            <!-- Modal content goes here -->
+    <!-- Modal de Agendamento -->
+    <div id="agendamentoModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4">
+        <div class="bg-dark-surface p-6 rounded-lg max-w-4xl w-full mx-auto shadow-lg fade-in">
+            <!-- Alterado de max-w-2xl para max-w-4xl -->
+            <h2 class="text-2xl font-bold mb-4 text-orange-custom text-center">
+                <i class="fas fa-calendar-check mr-2"></i>Agendar Serviço
+            </h2>
+            <p id="servicoNome" class="mb-4 text-center"></p>
+            <div id="diasDisponiveis" class="mb-4">
+                <h3 class="text-xl font-bold mb-2 text-orange-custom"><i class="far fa-calendar-alt mr-2"></i>Dias
+                    Disponíveis</h3>
+            </div>
+            <div id="horariosDisponiveis" class="mb-4">
+                <h3 class="text-xl font-bold mb-2 text-orange-custom"><i class="far fa-clock mr-2"></i>Horários
+                    Disponíveis</h3>
+            </div>
+            <div id="workersDisponiveis" class="mb-4">
+                <h3 class="text-xl font-bold mb-2 text-orange-custom"><i class="fas fa-user-tie mr-2"></i>Funcionários
+                    Disponíveis</h3>
+            </div>
+            <button id="confirmButton" onclick="confirmarAgendamento()"
+                class="bg-orange-custom hover:bg-orange-600 text-white font-bold py-2 px-4 rounded w-full mb-2 transition duration-300 hover:shadow-lg"
+                disabled>
+                <i class="fas fa-check-circle mr-2"></i>Confirmar Agendamento
+            </button>
+            <button onclick="fecharModal()"
+                class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded w-full transition duration-300 hover:shadow-lg">
+                <i class="fas fa-times-circle mr-2"></i>Cancelar
+            </button>
         </div>
     </div>
 
-    <!-- Modal de Avaliação -->
-    <div id="ratingModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden items-center justify-center z-50 p-4">
-        <div class="bg-dark-surface rounded-lg overflow-hidden shadow-2xl w-full max-w-sm md:max-w-md lg:max-w-lg mx-auto">
-            <!-- Rating modal content goes here -->
-        </div>
-    </div>
-
-    <!-- Footer Section with Appointment History -->
-    <div id="agendamentosRealizadosSection" class="mt-8">
-        <h2 class="text-2xl font-bold mb-4 text-center text-orange-custom">Agendamentos Realizados</h2>
-        <div id="agendamentosRealizados" class="flex flex-wrap justify-center"></div>
-    </div>
-
-    <!-- Firebase JS and Scripts -->
     <script src="../js/firebase-config.js"></script>
     <script src="../js/util.js"></script>
-    <script src="../js/auth.js"></script>
-    <script src="../js/appointments.js"></script>
-    <script src="../js/payment.js"></script>
-    <script src="../js/rating.js"></script>
-    <script src="../js/coment.js"></script>
-
+    <script src="../js/authpre.js"></script>
+    <script src="../js/pre.js"></script>
     <script>
-        // Inicialização e carregamento principal
+        // Verificar o estado de autenticação quando a página carregar
         document.addEventListener('DOMContentLoaded', () => {
-            console.log("DOM carregado, verificando autenticação...");
-
-            // Firebase auth state listener
-            auth.onAuthStateChanged((user) => {
-                if (user) {
-                    console.log("Usuário autenticado:", user.uid);
-                    showUserProfile(user);
-                    carregarAgendamentos(user);
-                } else {
-                    console.log("Usuário não autenticado, redirecionando...");
+            console.log("DOMContentLoaded em pre.101.1.html");
+            firebase.auth().onAuthStateChanged((user) => {
+                console.log("Estado de autenticação mudou em pre.101.1.html. Usuário:", user ? user.uid : "não autenticado");
+                if (!user) {
+                    const currentPage = window.location.pathname + window.location.search;
+                    sessionStorage.setItem('returnUrl', currentPage);
+                    console.log("Usuário não autenticado. Salvando returnUrl:", currentPage);
                     window.location.href = 'LoginTimeWise.html';
                 }
-            });
-
-            // Dropdown toggle
-            const menuButton = document.getElementById('menuButton');
-            const dropdownMenu = document.getElementById('dropdownMenu');
-            menuButton.addEventListener('click', () => {
-                dropdownMenu.classList.toggle('hidden');
-            });
-
-            // Logout logic
-            document.getElementById('logoutButton').addEventListener('click', () => {
-                auth.signOut().then(() => {
-                    console.log("Usuário deslogado.");
-                    window.location.href = 'LoginTimeWise.html';
-                }).catch((error) => {
-                    console.error("Erro ao deslogar:", error);
-                });
             });
         });
-
-        /**
-         * Exibe o perfil do usuário autenticado.
-         */
-        function showUserProfile(user) {
-            const userName = document.getElementById('userName');
-            const userProfile = document.getElementById('userProfile');
-
-            // Display user profile
-            userProfile.classList.remove('hidden');
-            userName.textContent = user.displayName || 'Usuário';
-        }
-
-        /**
-         * Carrega os agendamentos do usuário do Firestore.
-         */
-        function carregarAgendamentos(user) {
-            const agendamentosList = document.getElementById('agendamentosList');
-            agendamentosList.innerHTML = '<p>Carregando agendamentos...</p>';
-
-            const appointmentsRef = db.collection('appointments').where('userId', '==', user.uid);
-            appointmentsRef.get().then((querySnapshot) => {
-                if (querySnapshot.empty) {
-                    agendamentosList.innerHTML = '<p>Nenhum agendamento encontrado.</p>';
-                } else {
-                    let appointmentsHTML = '';
-                    querySnapshot.forEach((doc) => {
-                        const appointment = doc.data();
-                        appointmentsHTML += `
-                            <div class="appointment-item">
-                                <h3>${appointment.serviceName}</h3>
-                                <p>Data: ${appointment.date}</p>
-                                <p>Hora: ${appointment.time}</p>
-                                <p>Local: ${appointment.location}</p>
-                            </div>
-                        `;
-                    });
-                    agendamentosList.innerHTML = appointmentsHTML;
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            firebase.auth().onAuthStateChanged((user) => {
+                if (!user) {
+                    sessionStorage.setItem('returnUrl', 'pre.101.1.html');
+                    window.location.href = 'LoginTimeWise.html';
                 }
-            }).catch((error) => {
-                console.error("Erro ao carregar agendamentos:", error);
-                agendamentosList.innerHTML = '<p>Erro ao carregar agendamentos.</p>';
             });
-        }
+        });
     </script>
 </body>
 

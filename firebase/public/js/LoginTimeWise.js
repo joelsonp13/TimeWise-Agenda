@@ -87,6 +87,9 @@ registerForm.addEventListener('submit', (e) => {
             registerSection.style.display = 'none';
             loginSection.style.display = 'block';
         })
+          setTimeout(() => {
+                message.textContent = "";
+            }, 4000);
         .catch((error) => {
             let errorMessage = "";
             switch (error.code) {

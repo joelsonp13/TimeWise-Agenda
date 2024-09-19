@@ -201,22 +201,29 @@
         }
 
         // Format CNPJ to the expected format
-        function formatCNPJ(cnpj) {
-            return cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
-        }
+     function formatCNPJ(cnpj) {
+    // Remove non-numeric characters
+    cnpj = cnpj.replace(/\D/g, '');
+    // Format as expected
+    return cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
+}
 
         // Fetch data by CNPJ
     // Fetch data by CNPJ
+// Fetch data by CNPJ
 async function fetchDataByCNPJ() {
     // Get the CNPJ from the URL
     const urlParams = new URLSearchParams(window.location.search);
     const cnpj = urlParams.get('cnpj');
+    console.log('CNPJ from URL:', cnpj); // Print the CNPJ from the URL
+
     if (!cnpj) {
         document.getElementById('firebaseStatus').textContent = 'CNPJ não fornecido na URL.';
         return;
     }
 
     const formattedCNPJ = formatCNPJ(cnpj);
+    console.log('Formatted CNPJ:', formattedCNPJ); // Print the formatted CNPJ
 
     // Initialize Firestore
     const db = firebase.firestore();
@@ -255,10 +262,9 @@ async function fetchDataByCNPJ() {
 
     if (!found) {
         document.getElementById('firebaseStatus').textContent = 'Nenhum dado encontrado para o CNPJ fornecido.';
-        console.log('CNPJ extracted from URL:', cnpj);
-
     }
 }
+
 
         // Verificar o estado de autenticação quando a página carregar
         document.addEventListener('DOMContentLoaded', () => {

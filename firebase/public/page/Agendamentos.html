@@ -25,36 +25,38 @@
     </script>
 </head>
 <body class="bg-dark-bg text-gray-300">
-    <nav class="bg-dark-surface p-4 shadow-md">
-        <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-orange-custom text-2xl font-bold flex items-center">
-                <i class="fas fa-clock mr-2"></i>TimeWise
-            </h1>
-            <div id="userProfile" class="text-gray-300 hidden">
-                <div class="relative">
-                    <button id="userDropdown" class="flex items-center space-x-2 focus:outline-none">
-                        <span id="userName" class="text-white"></span>
-                        <i class="fas fa-chevron-down text-white"></i>
-                    </button>
-                    <div id="dropdownMenu" class="absolute right-0 mt-2 w-48 bg-dark-surface rounded-md shadow-lg hidden">
-                        <a href="../index.html" class="block px-4 py-2 text-sm text-white hover:bg-gray-700">
-                            <i class="fas fa-home mr-2"></i>Início
-                        </a>
-                        <a href="estabelecimento.html" class="block px-4 py-2 text-sm text-white hover:bg-gray-700">
-                            <i class="fas fa-calendar-alt mr-2"></i>Agendar
-                        </a>     
-                        <a href="Perfil.html" class="block px-4 py-2 text-sm text-white hover:bg-gray-700">
-                            <i class="fas fa-user mr-2"></i>Perfil
-                        </a>
-                        <button id="logoutButton"
-                            class="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-orange-custom hover:text-white">
-                            <i class="fas fa-sign-out-alt mr-2"></i>Sair
-                        </button>
-                    </div>
+   <nav class="bg-secondary p-4 shadow-md">
+    <div class="container mx-auto flex justify-between items-center">
+        <h1 class="text-primary text-2xl font-bold flex items-center">
+            <i class="fas fa-clock mr-2"></i>TimeWise
+        </h1>
+        
+        <!-- User Profile section, initially hidden -->
+        <div id="userProfile" class="text-text-light hidden">
+            <div class="relative">
+                <button id="userDropdown" class="flex items-center space-x-2 focus:outline-none">
+                    <div id="userAvatar" class="w-8 h-8 rounded-full bg-primary text-text-dark flex items-center justify-center mr-2"></div>
+                    <span id="userName" class="text-text-light"></span>
+                    <i class="fas fa-chevron-down text-text-light ml-2"></i>
+                </button>
+                <div id="userMenu" class="absolute right-0 mt-2 w-48 bg-secondary rounded-md shadow-lg hidden">
+                    <a href="page/estabelecimento.html" class="block px-4 py-2 text-sm text-text-light hover:bg-primary" data-requires-auth>Agendar</a>
+                    <a href="page/Agendamentos.html" class="block px-4 py-2 text-sm text-text-light hover:bg-primary" data-requires-auth>Agendamentos</a>
+                    <a href="page/Perfil.html" class="block px-4 py-2 text-sm text-text-light hover:bg-primary" data-requires-auth>Perfil</a>
+                    <a href="#" id="logoutButton" class="block px-4 py-2 text-sm text-text-light hover:bg-primary">Sair</a>
                 </div>
             </div>
         </div>
-    </nav>
+
+        <!-- Login button section, hidden when logged in -->
+        <div id="authButtons" class="text-text-light hidden">
+            <a href="page/LoginTimeWise.html" class="bg-primary hover:bg-accent text-text-dark font-bold py-2 px-6 rounded-full transition duration-300 shadow-md hover:shadow-lg flex items-center justify-center">
+                <i class="fas fa-sign-in-alt mr-2"></i>Login
+            </a>
+        </div>
+    </div>
+</nav>
+
 
     <div class="container mx-auto px-4 py-8">
         <h2 class="text-3xl font-bold mb-6 text-center text-orange-custom slide-in">
@@ -177,28 +179,96 @@
         <div id="agendamentosRealizados" class="flex flex-wrap justify-center"></div>
     </div>
 
-    <script src="../js/firebase-config.js"></script>
-    <script src="../js/util.js"></script>
-    <script src="../js/auth.js"></script>
-    <script src="../js/appointments.js"></script>
-    <script src="../js/payment.js"></script>
-    <script src="../js/rating.js"></script>
-    <script src="../js/coment.js"></script>
-    <script>
-        // Inicialização e carregamento principal
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log("DOM carregado, verificando autenticação...");
-            auth.onAuthStateChanged((user) => {
-                if (user) {
-                    console.log("Usuário autenticado:", user.uid);
-                    showUserProfile(user);
-                    carregarAgendamentos(user);
-                } else {
-                    console.log("Usuário não autenticado, redirecionando...");
-                    window.location.href = 'LoginTimeWise.html';
-                }
-            });
+<!-- Firebase scripts and custom JS files -->
+<script src="../js/firebase-config.js"></script>
+<script src="../js/util.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/appointments.js"></script>
+<script src="../js/payment.js"></script>
+<script src="../js/rating.js"></script>
+<script src="../js/coment.js"></script>
+
+<script>
+    // Wait for DOM content to load
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log("DOM carregado, verificando autenticação...");
+
+        // Check Firebase Authentication state
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                // User is authenticated
+                console.log("Usuário autenticado:", user.uid);
+                
+                // Show user profile
+                showUserProfile(user);
+
+                // Load user appointments
+                carregarAgendamentos(user);
+
+            } else {
+                // User is not authenticated, redirect to login page
+                console.log("Usuário não autenticado, redirecionando...");
+                window.location.href = 'LoginTimeWise.html';
+            }
         });
-    </script>
+    });
+
+    /**
+     * Function to display user profile data
+     * @param {Object} user - The authenticated user object from Firebase
+     */
+    function showUserProfile(user) {
+        const userName = document.getElementById('userName');
+        const userAvatar = document.getElementById('userAvatar');
+        const userProfile = document.getElementById('userProfile');
+        const authButtons = document.getElementById('authButtons');
+
+        // Hide auth buttons and show user profile
+        authButtons.classList.add('hidden');
+        userProfile.classList.remove('hidden');
+
+        // Display user info
+        userName.textContent = user.displayName || 'Usuário';
+        userAvatar.textContent = user.displayName ? user.displayName[0] : 'U'; // Use first letter of user's name
+    }
+
+    /**
+     * Function to load user's appointments from Firestore
+     * @param {Object} user - The authenticated user object from Firebase
+     */
+    function carregarAgendamentos(user) {
+        const appointmentsContainer = document.getElementById('appointmentsContainer'); // Assumed DOM element to display appointments
+        appointmentsContainer.innerHTML = '<p>Carregando agendamentos...</p>';
+
+        // Access Firestore (assuming Firebase Firestore is initialized in firebase-config.js)
+        const userId = user.uid;
+        const appointmentsRef = db.collection('appointments').where('userId', '==', userId);
+
+        // Fetch user appointments
+        appointmentsRef.get().then((querySnapshot) => {
+            if (querySnapshot.empty) {
+                appointmentsContainer.innerHTML = '<p>Nenhum agendamento encontrado.</p>';
+            } else {
+                let appointmentsHTML = '';
+                querySnapshot.forEach((doc) => {
+                    const appointment = doc.data();
+                    appointmentsHTML += `
+                        <div class="appointment-item">
+                            <h3>${appointment.serviceName}</h3>
+                            <p>Data: ${appointment.date}</p>
+                            <p>Hora: ${appointment.time}</p>
+                            <p>Local: ${appointment.location}</p>
+                        </div>
+                    `;
+                });
+                appointmentsContainer.innerHTML = appointmentsHTML;
+            }
+        }).catch((error) => {
+            console.error("Erro ao carregar agendamentos: ", error);
+            appointmentsContainer.innerHTML = '<p>Erro ao carregar agendamentos.</p>';
+        });
+    }
+</script>
+
 </body>
 </html>

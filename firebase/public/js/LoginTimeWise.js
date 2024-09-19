@@ -132,7 +132,7 @@ firebase.auth().onAuthStateChanged((user) => {
             window.location.href = 'returnUrl';
         } else {
             // Se não houver returnUrl, redirecione para uma página padrão
-            window.location.href = 'returnUrl';
+            
         }
     }
 });

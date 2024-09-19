@@ -27,32 +27,38 @@
     </script>
 </head>
 <body class="bg-dark-bg text-text-light">
-    <nav class="bg-secondary p-4 shadow-md">
-        <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-primary text-2xl font-bold flex items-center">
-                <i class="fas fa-clock mr-2"></i>TimeWise
-            </h1>
-            <div id="userProfile" class="text-text-light hidden">
-                <div class="relative">
-                    <button id="userDropdown" class="flex items-center space-x-2 focus:outline-none">
-                        <div id="userAvatar" class="w-8 h-8 rounded-full bg-primary text-text-dark flex items-center justify-center mr-2"></div>
-                        <span id="userName" class="text-text-light"></span>
-                        <i class="fas fa-chevron-down text-text-light ml-2"></i>
-                    </button>
-                    <div id="userMenu" class="absolute right-0 mt-2 w-48 bg-secondary rounded-md shadow-lg hidden">
-                          <a href="page/estabelecimento.html" class="block px-4 py-2 text-sm text-text-light hover:bg-primary" data-requires-auth>Agendar</a>
-                        <a href="page/Agendamentos.html" class="block px-4 py-2 text-sm text-text-light hover:bg-primary" data-requires-auth>Agendamentos</a>
-                        <a href="page/Perfil.html" class="block px-4 py-2 text-sm text-text-light hover:bg-primary" data-requires-auth>Perfil</a> 
-                        <a href="#" id="logoutButton" class="block px-4 py-2 text-sm text-text-light hover:bg-primary">Sair</a>
-                    </div>
+  <nav class="bg-secondary p-4 shadow-md">
+    <div class="container mx-auto flex justify-between items-center">
+        <h1 class="text-primary text-2xl font-bold flex items-center">
+            <i class="fas fa-clock mr-2"></i>TimeWise
+        </h1>
+        
+        <!-- User Profile section, initially hidden -->
+        <div id="userProfile" class="text-text-light hidden">
+            <div class="relative">
+                <button id="userDropdown" class="flex items-center space-x-2 focus:outline-none">
+                    <div id="userAvatar" class="w-8 h-8 rounded-full bg-primary text-text-dark flex items-center justify-center mr-2"></div>
+                    <span id="userName" class="text-text-light"></span>
+                    <i class="fas fa-chevron-down text-text-light ml-2"></i>
+                </button>
+                <div id="userMenu" class="absolute right-0 mt-2 w-48 bg-secondary rounded-md shadow-lg hidden">
+                    <a href="page/estabelecimento.html" class="block px-4 py-2 text-sm text-text-light hover:bg-primary" data-requires-auth>Agendar</a>
+                    <a href="page/Agendamentos.html" class="block px-4 py-2 text-sm text-text-light hover:bg-primary" data-requires-auth>Agendamentos</a>
+                    <a href="page/Perfil.html" class="block px-4 py-2 text-sm text-text-light hover:bg-primary" data-requires-auth>Perfil</a>
+                    <a href="#" id="logoutButton" class="block px-4 py-2 text-sm text-text-light hover:bg-primary">Sair</a>
                 </div>
             </div>
-            <div id="authButtons" class="text-text-light">
-                <a href="page/LoginTimeWise.html" class="bg-primary hover:bg-accent text-text-dark font-bold py-2 px-6 rounded-full transition duration-300 shadow-md hover:shadow-lg flex items-center justify-center">
-                    <i class="fas fa-sign-in-alt mr-2"></i>Login
-                </a>
-            </div>
-    </nav>
+        </div>
+
+        <!-- Login button section, hidden when logged in -->
+        <div id="authButtons" class="text-text-light hidden">
+            <a href="page/LoginTimeWise.html" class="bg-primary hover:bg-accent text-text-dark font-bold py-2 px-6 rounded-full transition duration-300 shadow-md hover:shadow-lg flex items-center justify-center">
+                <i class="fas fa-sign-in-alt mr-2"></i>Login
+            </a>
+        </div>
+    </div>
+</nav>
+
 
     <div class="container mx-auto px-4">
         <div class="flex flex-wrap justify-center items-end gap-4 bg-dark-bg p-8 rounded-lg">
@@ -287,6 +293,43 @@
                 console.log('Erro ao fazer logout:', error);
             });
         }
+        document.addEventListener('DOMContentLoaded', function () {
+    // Simulate a function to check if the user is logged in (can be replaced by actual logic)
+    const userLoggedIn = localStorage.getItem('userLoggedIn'); // This can be any check based on your logic
+
+    const userProfile = document.getElementById('userProfile');
+    const authButtons = document.getElementById('authButtons');
+    const userName = document.getElementById('userName');
+    const userAvatar = document.getElementById('userAvatar');
+    
+    // Check if user is logged in
+    if (userLoggedIn) {
+        // Display user profile
+        userProfile.classList.remove('hidden');
+        authButtons.classList.add('hidden');
+
+        // Set user data (e.g., fetched from localStorage or an API)
+        const userInfo = JSON.parse(localStorage.getItem('userInfo')); // Example
+        if (userInfo) {
+            userName.textContent = userInfo.name;
+            userAvatar.textContent = userInfo.initials; // Or use a real avatar image if available
+        }
+
+    } else {
+        // Display login button
+        userProfile.classList.add('hidden');
+        authButtons.classList.remove('hidden');
+    }
+
+    // User logout logic
+    document.getElementById('logoutButton').addEventListener('click', function() {
+        localStorage.removeItem('userLoggedIn');
+        localStorage.removeItem('userInfo');
+        // Optionally redirect to login page
+        window.location.href = 'page/LoginTimeWise.html';
+    });
+});
+
 
         // Adicionar evento de clique para o botão de logout
         document.getElementById('logoutButton').addEventListener('click', logout);

@@ -130,26 +130,22 @@ resetPasswordForm.addEventListener('submit', (e) => {
 // No início do arquivo, após a inicialização do Firebase:
 firebase.auth().onAuthStateChanged((user) => {
     if (user) {
+        // Check if the user just signed up (isNewUser is set during the signup process)
         const isNewUser = sessionStorage.getItem('isNewUser');
 
-        // Verifica se o usuário acabou de se registrar
         if (isNewUser) {
-            sessionStorage.removeItem('isNewUser'); // Remove a flag após o uso
-
-            // Exibe a seção de login e oculta a seção de cadastro
-            document.getElementById('registerSection').style.display = 'none';
-            document.getElementById('loginSection').style.display = 'block';
+            // If the user is newly registered, remove the flag and redirect to the login page
+            sessionStorage.removeItem('isNewUser'); // Clean up the flag
+            window.location.href = 'login.html'; // Redirect to the login page
         } else {
-            // Caso contrário, o usuário está fazendo login
-            const returnUrl = sessionStorage.getItem('returnUrl');
-            if (returnUrl) {
-                sessionStorage.removeItem('returnUrl');
-                window.location.href = returnUrl;
-            } else {
-                window.location.href = 'estabelecimento.html'; // Redireciona para a página padrão
-            }
+            // Otherwise, the user is logging in, redirect to "estabelecimento.html"
+            window.location.href = 'estabelecimento.html'; // Redirect to the establishment page
         }
+    } else {
+        // If no user is logged in, ensure the user stays on the login page or register page
+        window.location.href = 'login.html'; // Redirect to the login page (or keep it as needed)
     }
 });
+
 
 

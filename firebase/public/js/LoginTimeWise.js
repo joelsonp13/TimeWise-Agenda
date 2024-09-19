@@ -1,4 +1,4 @@
-// Configuração do Firebase
+// Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyBrG14qUCGOIMucxBArrhzZ2hG2ilidwnU",
     authDomain: "time-wise-agendamentos.firebaseapp.com",
@@ -9,13 +9,13 @@ const firebaseConfig = {
     measurementId: "G-63ZD6V69EV"
 };
 
-// Inicializar o Firebase
+// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
-// Inicializar Firestore
+// Initialize Firestore
 const db = firebase.firestore();
 
-// Referências aos elementos do DOM
+// DOM references
 const loginSection = document.getElementById('loginSection');
 const registerSection = document.getElementById('registerSection');
 const resetPasswordSection = document.getElementById('resetPasswordSection');
@@ -24,7 +24,7 @@ const registerForm = document.getElementById('registerForm');
 const resetPasswordForm = document.getElementById('resetPasswordForm');
 const message = document.getElementById('message');
 
-// Funções para alternar entre as seções
+// Toggle between sections
 document.getElementById('showRegister').addEventListener('click', () => {
     loginSection.style.display = 'none';
     registerSection.style.display = 'block';
@@ -55,16 +55,16 @@ loginForm.addEventListener('submit', (e) => {
         .then((userCredential) => {
             const user = userCredential.user;
             message.textContent = "Login bem-sucedido!";
-            message.style.color = "#4CAF50"; // Verde para sucesso
-            // O redirecionamento será tratado pelo onAuthStateChanged
+            message.style.color = "#4CAF50"; // Success message in green
+            // Redirect handled by onAuthStateChanged
         })
         .catch((error) => {
-            // ... (mantenha o código de tratamento de erro existente)
+            message.textContent = "Erro no login: " + error.message;
+            message.style.color = "#ff4444"; // Error message in red
         });
 });
 
-// Cadastro
-// Cadastro
+// Register
 registerForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const name = document.getElementById('registerName').value;
@@ -73,10 +73,10 @@ registerForm.addEventListener('submit', (e) => {
 
     firebase.auth().createUserWithEmailAndPassword(email, password)
         .then((userCredential) => {
-            sessionStorage.setItem('isNewUser', true);
             const user = userCredential.user;
+            sessionStorage.setItem('isNewUser', true);
 
-            // Salvar dados do usuário no Firestore
+            // Save user data in Firestore
             return db.collection('usersweb').doc(user.uid).set({
                 name: name,
                 email: user.email,
@@ -85,14 +85,14 @@ registerForm.addEventListener('submit', (e) => {
         })
         .then(() => {
             message.textContent = "Cadastro realizado com sucesso!";
-            message.style.color = "#4CAF50"; // Verde para sucesso
-            
-            // Sign out the newly registered user to prevent auto-login
+            message.style.color = "#4CAF50"; // Success message in green
+
+            // Sign out the user to prevent automatic login after registration
             return firebase.auth().signOut();
         })
         .then(() => {
-            // After sign out, redirect to login page
-            window.location.href = 'LoginTimeWise.html'; // Redirect to the login page
+            // Redirect to the login page after signing out
+            window.location.href = 'LoginTimeWise.html';
         })
         .catch((error) => {
             let errorMessage = "";
@@ -110,12 +110,11 @@ registerForm.addEventListener('submit', (e) => {
                     errorMessage = "Erro no cadastro: " + error.message;
             }
             message.textContent = errorMessage;
-            message.style.color = "#ff4444"; // Vermelho para erro
+            message.style.color = "#ff4444"; // Error message in red
         });
 });
 
-
-// Recuperação de senha
+// Password reset
 resetPasswordForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const email = document.getElementById('resetEmail').value;
@@ -128,36 +127,33 @@ resetPasswordForm.addEventListener('submit', (e) => {
         })
         .catch((error) => {
             message.textContent = "Erro ao enviar email de recuperação: " + error.message;
+            message.style.color = "#ff4444"; // Error message in red
         });
 });
 
-// No início do arquivo, após a inicialização do Firebase:
+// Handle authentication state changes
 firebase.auth().onAuthStateChanged((user) => {
-    const currentPage = window.location.pathname; // Get the current page path
+    const currentPage = window.location.pathname; // Get current page path
 
     if (user) {
-        // Check if the user just signed up (isNewUser is set during the signup process)
+        // Check if the user is newly registered (sessionStorage flag is set)
         const isNewUser = sessionStorage.getItem('isNewUser');
 
         if (isNewUser) {
-            // If the user is newly registered, remove the flag and redirect to the login page
             sessionStorage.removeItem('isNewUser'); // Clean up the flag
             if (currentPage !== '/LoginTimeWise.html') {
                 window.location.href = 'LoginTimeWise.html'; // Redirect to the login page
             }
         } else {
-            // Otherwise, the user is logging in, redirect to "estabelecimento.html"
+            // Otherwise, redirect logged-in users to 'estabelecimento.html'
             if (currentPage !== '/estabelecimento.html') {
-                window.location.href = 'estabelecimento.html'; // Redirect to the establishment page
+                window.location.href = 'estabelecimento.html'; // Redirect to establishment page
             }
         }
     } else {
-        // If no user is logged in, ensure the user stays on the login page
+        // Ensure logged-out users stay on the login page
         if (currentPage !== '/LoginTimeWise.html') {
-            window.location.href = 'LoginTimeWise.html'; // Redirect to the login page if on another page
+            window.location.href = 'LoginTimeWise.html'; // Redirect to login page
         }
     }
 });
-
-
-

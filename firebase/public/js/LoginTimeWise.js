@@ -133,6 +133,8 @@ resetPasswordForm.addEventListener('submit', (e) => {
 
 // No início do arquivo, após a inicialização do Firebase:
 firebase.auth().onAuthStateChanged((user) => {
+    const currentPage = window.location.pathname; // Get the current page path
+
     if (user) {
         // Check if the user just signed up (isNewUser is set during the signup process)
         const isNewUser = sessionStorage.getItem('isNewUser');
@@ -140,14 +142,20 @@ firebase.auth().onAuthStateChanged((user) => {
         if (isNewUser) {
             // If the user is newly registered, remove the flag and redirect to the login page
             sessionStorage.removeItem('isNewUser'); // Clean up the flag
-            window.location.href = 'LoginTimeWise.html'; // Redirect to the login page
+            if (currentPage !== '/LoginTimeWise.html') {
+                window.location.href = 'LoginTimeWise.html'; // Redirect to the login page
+            }
         } else {
             // Otherwise, the user is logging in, redirect to "estabelecimento.html"
-            window.location.href = 'estabelecimento.html'; // Redirect to the establishment page
+            if (currentPage !== '/estabelecimento.html') {
+                window.location.href = 'estabelecimento.html'; // Redirect to the establishment page
+            }
         }
     } else {
-        // If no user is logged in, ensure the user stays on the login page or register page
-        window.location.href = 'LoginTimeWise.html'; // Redirect to the login page (or keep it as needed)
+        // If no user is logged in, ensure the user stays on the login page
+        if (currentPage !== '/LoginTimeWise.html') {
+            window.location.href = 'LoginTimeWise.html'; // Redirect to the login page if on another page
+        }
     }
 });
 

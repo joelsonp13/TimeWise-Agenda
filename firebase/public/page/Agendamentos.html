@@ -35,7 +35,12 @@
             </h1>
 
             <!-- User Profile Dropdown -->
-            <div id="userProfile" class="text-gray-300 hidden relative">
+            <div id="userProfile" class="text-gray-300 hidden relative flex items-center">
+                <div id="userAvatar" class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center mr-2">
+                    <!-- Default Avatar or User Photo -->
+                    <img id="userPhoto" src="" alt="User Avatar" class="hidden w-full h-full rounded-full object-cover">
+                    <span id="userInitials" class="text-white font-bold"></span>
+                </div>
                 <button id="menuButton" class="bg-orange-custom hover:bg-orange-600 text-white font-bold py-2 px-4 rounded transition duration-300 hover:shadow-lg flex items-center">
                     <span id="userName" class="mr-2"></span>
                     <i class="fas fa-chevron-down"></i>
@@ -71,34 +76,11 @@
         <div id="agendamentosList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
     </div>
 
-    <!-- Modal de Pagamento -->
-    <div id="paymentModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden items-center justify-center z-50 p-4">
-        <div class="bg-dark-surface rounded-lg overflow-hidden shadow-2xl w-full max-w-sm md:max-w-md lg:max-w-lg mx-auto">
-            <!-- Modal content goes here -->
-        </div>
-    </div>
-
-    <!-- Modal de Avaliação -->
-    <div id="ratingModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden items-center justify-center z-50 p-4">
-        <div class="bg-dark-surface rounded-lg overflow-hidden shadow-2xl w-full max-w-sm md:max-w-md lg:max-w-lg mx-auto">
-            <!-- Rating modal content goes here -->
-        </div>
-    </div>
-
-    <!-- Footer Section with Appointment History -->
-    <div id="agendamentosRealizadosSection" class="mt-8">
-        <h2 class="text-2xl font-bold mb-4 text-center text-orange-custom">Agendamentos Realizados</h2>
-        <div id="agendamentosRealizados" class="flex flex-wrap justify-center"></div>
-    </div>
-
     <!-- Firebase JS and Scripts -->
     <script src="../js/firebase-config.js"></script>
     <script src="../js/util.js"></script>
     <script src="../js/auth.js"></script>
     <script src="../js/appointments.js"></script>
-    <script src="../js/payment.js"></script>
-    <script src="../js/rating.js"></script>
-    <script src="../js/coment.js"></script>
 
     <script>
         // Inicialização e carregamento principal
@@ -140,11 +122,29 @@
          */
         function showUserProfile(user) {
             const userName = document.getElementById('userName');
+            const userAvatar = document.getElementById('userAvatar');
+            const userPhoto = document.getElementById('userPhoto');
+            const userInitials = document.getElementById('userInitials');
             const userProfile = document.getElementById('userProfile');
 
             // Display user profile
             userProfile.classList.remove('hidden');
+
+            // Set user name or default to "Usuário"
             userName.textContent = user.displayName || 'Usuário';
+
+            // If user has a photo URL, show the image; otherwise, show initials
+            if (user.photoURL) {
+                userPhoto.src = user.photoURL;
+                userPhoto.classList.remove('hidden');
+                userInitials.classList.add('hidden');
+            } else {
+                // Show initials from display name (if available)
+                const initials = user.displayName ? user.displayName.charAt(0).toUpperCase() : 'U';
+                userInitials.textContent = initials;
+                userPhoto.classList.add('hidden');
+                userInitials.classList.remove('hidden');
+            }
         }
 
         /**

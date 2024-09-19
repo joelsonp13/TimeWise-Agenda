@@ -72,6 +72,7 @@ registerForm.addEventListener('submit', (e) => {
 
     firebase.auth().createUserWithEmailAndPassword(email, password)
         .then((userCredential) => {
+            sessionStorage.setItem('isNewUser', true);
             const user = userCredential.user;
             
             // Salvar dados do usuário no Firestore
@@ -129,13 +130,22 @@ resetPasswordForm.addEventListener('submit', (e) => {
 // No início do arquivo, após a inicialização do Firebase:
 firebase.auth().onAuthStateChanged((user) => {
     if (user) {
-        const returnUrl = sessionStorage.getItem('returnUrl');
-        if (returnUrl) {
-            sessionStorage.removeItem('returnUrl');
-            window.location.href = returnUrl;
+        const isNewUser = sessionStorage.getItem('isNewUser');
+
+        // Verifica se o usuário acabou de se registrar
+        if (isNewUser) {
+            sessionStorage.removeItem('isNewUser'); // Remove a flag após o uso
+            window.location.href = 'LoginTimeWise.html'; // Redireciona para a página de login
         } else {
-            window.location.href = returnUrl // Se não houver returnUrl, redirecione para uma página padrão
-            
+            // Caso contrário, o usuário está fazendo login
+            const returnUrl = sessionStorage.getItem('returnUrl');
+            if (returnUrl) {
+                sessionStorage.removeItem('returnUrl');
+                window.location.href = returnUrl;
+            } else {
+                window.location.href = 'estabelecimento.html'; // Redireciona para a página padrão
+            }
         }
     }
 });
+

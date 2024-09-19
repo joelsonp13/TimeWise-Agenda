@@ -10,8 +10,7 @@ let selectedWorkerId = null; // Variável para armazenar o ID do funcionário se
 let isRedirecting = false;
 
 // Função para buscar dados pelo CNPJ
-function fetchDataByCNPJ() {
-    const cnpj = document.getElementById('cnpjInput').value;
+function fetchDataByCNPJ(cnpj) {
     const statusElement = document.getElementById('firebaseStatus');
     if (!cnpj) {
         statusElement.textContent = "Por favor, insira um CNPJ.";
@@ -94,6 +93,24 @@ function fetchDataByCNPJ() {
         statusElement.classList.add('text-red-600');
     });
 }
+
+// Função para obter o parâmetro CNPJ da URL
+function getCnpjFromUrl() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('cnpj');
+}
+
+// Chamar a função para buscar dados pelo CNPJ quando a página carregar
+document.addEventListener('DOMContentLoaded', () => {
+    const cnpj = getCnpjFromUrl();
+    if (cnpj) {
+        fetchDataByCNPJ(cnpj);
+    } else {
+        const statusElement = document.getElementById('firebaseStatus');
+        statusElement.textContent = "CNPJ não fornecido na URL.";
+        statusElement.classList.add('text-red-600');
+    }
+});
 
 let comentariosCarrossel = [];
 let comentarioAtual = 0;

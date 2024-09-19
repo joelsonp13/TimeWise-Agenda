@@ -24,6 +24,19 @@ const registerForm = document.getElementById('registerForm');
 const resetPasswordForm = document.getElementById('resetPasswordForm');
 const message = document.getElementById('message');
 
+// Function to display messages and automatically hide them after 4 seconds
+function showMessage(text, color) {
+    message.textContent = text;
+    message.style.color = color;
+    message.style.display = 'block';
+
+    // Hide the message after 4 seconds
+    setTimeout(() => {
+        message.textContent = "";
+        message.style.display = 'none';
+    }, 4000);
+}
+
 // Toggle between forms
 document.getElementById('showRegister').addEventListener('click', () => {
     loginSection.style.display = 'none';
@@ -58,13 +71,11 @@ loginForm.addEventListener('submit', (e) => {
     firebase.auth().signInWithEmailAndPassword(email, password)
         .then((userCredential) => {
             const user = userCredential.user;
-            message.textContent = "Login bem-sucedido!";
-            message.style.color = "#4CAF50"; // Success message in green
+            showMessage("Login bem-sucedido!", "#4CAF50"); // Success message in green
             // Redirect handled by onAuthStateChanged
         })
         .catch((error) => {
-            message.textContent = "Erro no login: " + error.message;
-            message.style.color = "#ff4444"; // Error message in red
+            showMessage("Erro no login: " + error.message, "#ff4444"); // Error message in red
         });
 });
 
@@ -88,15 +99,15 @@ registerForm.addEventListener('submit', (e) => {
             });
         })
         .then(() => {
-            message.textContent = "Cadastro realizado com sucesso!";
-            message.style.color = "#4CAF50"; // Success message in green
+            showMessage("Cadastro realizado com sucesso! Agora faça login.", "#4CAF50"); // Success message in green
 
             // Sign out the user to prevent automatic login after registration
             return firebase.auth().signOut();
         })
         .then(() => {
-            // Redirect to the login page after signing out
-            window.location.href = 'LoginTimeWise.html';
+            // Show login form after signing out
+            registerSection.style.display = 'none';
+            loginSection.style.display = 'block';
         })
         .catch((error) => {
             let errorMessage = "";
@@ -113,8 +124,7 @@ registerForm.addEventListener('submit', (e) => {
                 default:
                     errorMessage = "Erro no cadastro: " + error.message;
             }
-            message.textContent = errorMessage;
-            message.style.color = "#ff4444"; // Error message in red
+            showMessage(errorMessage, "#ff4444"); // Error message in red
         });
 });
 
@@ -125,13 +135,12 @@ resetPasswordForm.addEventListener('submit', (e) => {
 
     firebase.auth().sendPasswordResetEmail(email)
         .then(() => {
-            message.textContent = "Email de recuperação de senha enviado. Verifique sua caixa de entrada.";
+            showMessage("Email de recuperação de senha enviado. Verifique sua caixa de entrada.", "#4CAF50");
             resetPasswordSection.style.display = 'none';
             loginSection.style.display = 'block';
         })
         .catch((error) => {
-            message.textContent = "Erro ao enviar email de recuperação: " + error.message;
-            message.style.color = "#ff4444"; // Error message in red
+            showMessage("Erro ao enviar email de recuperação: " + error.message, "#ff4444"); // Error message in red
         });
 });
 
